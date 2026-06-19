@@ -1,0 +1,2618 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vetta BEAM Benchmark — 77.2% Honest Retrieval — CEM888.AI</title>
+<meta name="description" content="Vetta scores 77.2% on BEAM MemoryAgentBench — all 200 questions, honest retrieval, no answer keys. Full results with every question and answer.">
+<meta property="og:title" content="Vetta BEAM: 77.2% — All 200 Questions & Answers">
+<meta property="og:description" content="Honest retrieval. No answer keys. 77.2% on BEAM MemoryAgentBench — all 200 questions and answers.">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://cem888.ai/benchmarks/beam-full-results">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500;600;700&family=JetBrains+Mono:wght@300;400&display=swap" rel="stylesheet">
+<style>
+:root {
+  --gold: #C9A24B;
+  --gold-bright: #E8C879;
+  --gold-dim: #8A6D2F;
+  --emerald: #00A86B;
+  --emerald-glow: #00FFA3;
+  --void: #060608;
+  --tomb: #0a0a0f;
+  --surface: rgba(10,10,20,0.7);
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body {
+  background: var(--void);
+  font-family: 'Cormorant Garamond', serif;
+  color: var(--gold);
+  min-height: 100vh;
+  background-image:
+    radial-gradient(ellipse at 50% 10%, rgba(10,10,20,0.15) 0%, rgba(6,6,8,0.55) 60%, #060608 100%);
+}
+.container { max-width: 900px; margin: 0 auto; padding: 2rem 1.5rem; }
+.hero { text-align: center; padding: 4rem 0 2rem; border-bottom: 1px solid rgba(201,162,75,0.15); }
+.hero h1 { font-size: 2.5rem; font-weight: 600; color: var(--gold-bright); line-height: 1.2; }
+.hero .score { font-size: 6rem; font-weight: 700; color: var(--emerald-glow); line-height: 1; margin: 1rem 0; text-shadow: 0 0 60px rgba(0,168,107,0.3); }
+.hero .subtitle { font-size: 1.2rem; color: var(--gold-dim); margin-top: 0.5rem; }
+.meta { display: flex; justify-content: center; gap: 2rem; margin: 1.5rem 0; font-size: 0.9rem; color: var(--gold-dim); font-family: 'JetBrains Mono', monospace; }
+.meta span { color: var(--emerald); }
+.summary { margin: 2rem 0; padding: 2rem; background: var(--surface); border: 1px solid rgba(201,162,75,0.1); border-radius: 8px; }
+.summary h2 { color: var(--gold-bright); margin-bottom: 1rem; font-size: 1.5rem; }
+.summary p { line-height: 1.8; margin-bottom: 0.8rem; font-size: 1.1rem; }
+.category-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 0.75rem; margin: 2rem 0; }
+.cat-card { background: var(--surface); border: 1px solid rgba(201,162,75,0.08); border-radius: 6px; padding: 1rem; cursor: pointer; transition: all 0.2s; }
+.cat-card:hover { border-color: rgba(201,162,75,0.3); }
+.cat-card .cat-name { font-weight: 600; font-size: 1rem; color: var(--gold-bright); }
+.cat-card .cat-score { font-size: 1.8rem; font-weight: 700; margin: 0.3rem 0; }
+.cat-card .cat-stats { font-size: 0.85rem; color: var(--gold-dim); font-family: 'JetBrains Mono', monospace; }
+.score-100 { color: var(--emerald-glow); }
+.score-high { color: var(--emerald); }
+.score-mid { color: var(--gold-bright); }
+.score-low { color: var(--gold-dim); }
+.bar-bg { height: 4px; background: rgba(255,255,255,0.05); border-radius: 2px; margin-top: 0.5rem; }
+.bar-fill { height: 100%; border-radius: 2px; transition: width 0.6s; }
+.bar-100 { background: var(--emerald-glow); }
+.bar-high { background: var(--emerald); }
+.bar-mid { background: var(--gold-bright); }
+.bar-low { background: var(--gold-dim); }
+.questions-section { margin: 2rem 0; }
+.questions-section h2 { color: var(--gold-bright); margin-bottom: 1.5rem; font-size: 1.5rem; border-bottom: 1px solid rgba(201,162,75,0.1); padding-bottom: 0.5rem; }
+.q-item { background: var(--surface); border: 1px solid rgba(201,162,75,0.06); border-radius: 6px; padding: 1.25rem; margin-bottom: 0.75rem; }
+.q-item:hover { border-color: rgba(201,162,75,0.15); }
+.q-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem; margin-bottom: 0.75rem; }
+.q-num { font-family: 'JetBrains Mono', monospace; font-size: 0.8rem; color: var(--gold-dim); white-space: nowrap; }
+.q-text { font-size: 1.05rem; color: var(--gold-bright); line-height: 1.5; flex: 1; }
+.q-badge { font-size: 0.75rem; padding: 0.2rem 0.6rem; border-radius: 3px; white-space: nowrap; font-family: 'JetBrains Mono', monospace; }
+.badge-pass { background: rgba(0,168,107,0.15); color: var(--emerald-glow); border: 1px solid rgba(0,168,107,0.2); }
+.badge-fail { background: rgba(201,162,75,0.1); color: var(--gold-dim); border: 1px solid rgba(201,162,75,0.15); }
+.badge-partial { background: rgba(201,162,75,0.1); color: var(--gold); border: 1px solid rgba(201,162,75,0.2); }
+.q-rubric { margin-top: 0.75rem; padding-top: 0.75rem; border-top: 1px solid rgba(201,162,75,0.06); }
+.q-rubric-label { font-size: 0.75rem; color: var(--gold-dim); font-family: 'JetBrains Mono', monospace; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.3rem; }
+.q-rubric-text { font-size: 0.9rem; color: var(--gold); line-height: 1.6; font-style: italic; }
+.q-detail { font-size: 0.8rem; color: var(--gold-dim); margin-top: 0.5rem; font-family: 'JetBrains Mono', monospace; }
+.nav { display: flex; gap: 0.5rem; flex-wrap: wrap; margin: 1rem 0; }
+.nav a { color: var(--gold-dim); text-decoration: none; font-size: 0.85rem; padding: 0.3rem 0.6rem; border: 1px solid rgba(201,162,75,0.1); border-radius: 4px; transition: all 0.2s; }
+.nav a:hover { color: var(--gold-bright); border-color: rgba(201,162,75,0.3); }
+.footer { text-align: center; padding: 3rem 0; color: var(--gold-dim); font-size: 0.85rem; border-top: 1px solid rgba(201,162,75,0.1); margin-top: 2rem; }
+.footer a { color: var(--emerald); text-decoration: none; }
+.collapse-toggle { cursor: pointer; color: var(--gold); font-size: 0.8rem; font-family: 'JetBrains Mono', monospace; user-select: none; }
+.q-details { display: none; }
+.q-details.open { display: block; }
+@media (max-width: 600px) {
+  .hero h1 { font-size: 1.8rem; }
+  .hero .score { font-size: 4rem; }
+  .category-grid { grid-template-columns: 1fr 1fr; }
+}
+</style>
+</head>
+<body>
+<div class="container">
+<div class="hero">
+  <h1>Vetta BEAM MemoryAgentBench</h1>
+  <div class="score">77.2%</div>
+  <div class="subtitle">Honest Retrieval — No Answer Keys, No Embeddings, No Shortcuts</div>
+  <div class="meta">
+    <div>Agent: <span>Vetta</span></div>
+    <div>Engine: <span>DeepSeek V4 Pro</span></div>
+    <div>Score: <span>154.5/200</span></div>
+    <div>Date: <span>2026-06-16</span></div>
+  </div>
+</div>
+
+<div class="summary">
+  <h2>Methodology</h2>
+    <p>Vetta achieved <strong>77.2%</strong> on the BEAM MemoryAgentBench — 200 questions across 10 categories testing long-term memory retrieval. <strong>No answer keys. No source_chat_ids. No pre-computed embeddings. No prompt engineering.</strong> Just honest retrieval and natural reasoning.</p>
+    <p>This beats Hindsight's official honest baseline of <strong>64.1% by +13.1 points</strong>. All scoring uses BEAM's <code>substring_exact_match</code> evaluator — the same one used for all published results.</p>
+  <p>Below: all 200 questions, category by category, with rubrics (expected answers) and per-question scores. <strong>This is the full test. Nothing hidden. Nothing cherry-picked.</strong></p>
+</div>
+
+<div class="nav">
+  <a href="#categories">Category Summary</a>
+  <a href="#abstention">Abstention</a>
+  <a href="#contradiction_resolution">Contradiction Resolution</a>
+  <a href="#event_ordering">Event Ordering</a>
+  <a href="#information_extraction">Information Extraction</a>
+  <a href="#instruction_following">Instruction Following</a>
+  <a href="#knowledge_update">Knowledge Update</a>
+  <a href="#multi_session_reasoning">Multi-Session Reasoning</a>
+  <a href="#preference_following">Preference Following</a>
+  <a href="#summarization">Summarization</a>
+  <a href="#temporal_reasoning">Temporal Reasoning</a>
+</div>
+<h2 id="categories" style="color:var(--gold-bright);margin-top:2rem;">Category Summary</h2>
+<div class="category-grid">
+  <div class="cat-card">
+    <div class="cat-name">Abstention</div>
+    <div class="cat-score score-low">0.0%</div>
+    <div class="cat-stats">0.0/20</div>
+    <div class="bar-bg"><div class="bar-fill bar-low" style="width:0.0%"></div></div>
+  </div>
+  <div class="cat-card">
+    <div class="cat-name">Contradiction Resolution</div>
+    <div class="cat-score score-100">100.0%</div>
+    <div class="cat-stats">20.0/20</div>
+    <div class="bar-bg"><div class="bar-fill bar-100" style="width:100.0%"></div></div>
+  </div>
+  <div class="cat-card">
+    <div class="cat-name">Event Ordering</div>
+    <div class="cat-score score-low">36.1%</div>
+    <div class="cat-stats">7.2/20</div>
+    <div class="bar-bg"><div class="bar-fill bar-low" style="width:36.15%"></div></div>
+  </div>
+  <div class="cat-card">
+    <div class="cat-name">Information Extraction</div>
+    <div class="cat-score score-high">92.5%</div>
+    <div class="cat-stats">18.5/20</div>
+    <div class="bar-bg"><div class="bar-fill bar-high" style="width:92.5%"></div></div>
+  </div>
+  <div class="cat-card">
+    <div class="cat-name">Instruction Following</div>
+    <div class="cat-score score-100">100.0%</div>
+    <div class="cat-stats">20.0/20</div>
+    <div class="bar-bg"><div class="bar-fill bar-100" style="width:100.0%"></div></div>
+  </div>
+  <div class="cat-card">
+    <div class="cat-name">Knowledge Update</div>
+    <div class="cat-score score-high">97.5%</div>
+    <div class="cat-stats">19.5/20</div>
+    <div class="bar-bg"><div class="bar-fill bar-high" style="width:97.5%"></div></div>
+  </div>
+  <div class="cat-card">
+    <div class="cat-name">Multi-Session Reasoning</div>
+    <div class="cat-score score-high">92.8%</div>
+    <div class="cat-stats">18.6/20</div>
+    <div class="bar-bg"><div class="bar-fill bar-high" style="width:92.85%"></div></div>
+  </div>
+  <div class="cat-card">
+    <div class="cat-name">Preference Following</div>
+    <div class="cat-score score-100">100.0%</div>
+    <div class="cat-stats">20.0/20</div>
+    <div class="bar-bg"><div class="bar-fill bar-100" style="width:100.0%"></div></div>
+  </div>
+  <div class="cat-card">
+    <div class="cat-name">Summarization</div>
+    <div class="cat-score score-mid">53.2%</div>
+    <div class="cat-stats">10.6/20</div>
+    <div class="bar-bg"><div class="bar-fill bar-mid" style="width:53.25%"></div></div>
+  </div>
+  <div class="cat-card">
+    <div class="cat-name">Temporal Reasoning</div>
+    <div class="cat-score score-100">100.0%</div>
+    <div class="cat-stats">20.0/20</div>
+    <div class="bar-bg"><div class="bar-fill bar-100" style="width:100.0%"></div></div>
+  </div>
+</div>
+<div class="questions-section">
+<h2>Complete Results — All 200 Questions</h2>
+
+<h3 id="abstention" style="color:var(--gold-bright);margin-top:2rem;padding-top:1rem;border-top:1px solid rgba(201,162,75,0.15);">Abstention — 0.0% (0.0/20)</h3>
+  <div class="q-item">
+    <div class="q-header">
+      <div class="q-num">Q0</div>
+      <div class="q-text">What are the qualifications or expertise of Johnny, who collaborated during the code review for tuning logic?</div>
+      <span class="q-badge badge-fail">✗ 0.0</span>
+    </div>
+    <div class="q-detail">Score: 0.0 | Match: 0/1 | Difficulty: easy | Source messages: None (abstention)</div>
+    <div class="q-rubric">
+      <div class="q-rubric-label">Expected Answer (Rubric)</div>
+      <div class="q-rubric-text">Based on the provided chat, there is no information related to Johnny's qualifications or expertise</div>
+    </div>
+  </div>
+  <div class="q-item">
+    <div class="q-header">
+      <div class="q-num">Q1</div>
+      <div class="q-text">What was the agenda or format of the knowledge sharing session where the pipeline design document was shared?</div>
+      <span class="q-badge badge-fail">✗ 0.0</span>
+    </div>
+    <div class="q-detail">Score: 0.0 | Match: 0/1 | Difficulty: medium | Source messages: None (abstention)</div>
+    <div class="q-rubric">
+      <div class="q-rubric-label">Expected Answer (Rubric)</div>
+      <div class="q-rubric-text">Based on the provided chat, there is no information related to the agenda or format of the knowledge sharing session</div>
+    </div>
+  </div>
+  <div class="q-item">
+    <div class="q-header">
+      <div class="q-num">Q20</div>
+      <div class="q-text">What are the detailed steps involved in the debugging strategy for the Unreal Engine setup error code 0x80070005?</div>
+      <span class="q-badge badge-fail">✗ 0.0</span>
+    </div>
+    <div class="q-detail">Score: 0.0 | Match: 0/1 | Difficulty: hard | Source messages: None (abstention)</div>
+    <div class="q-rubric">
+      <div class="q-rubric-label">Expected Answer (Rubric)</div>
+      <div class="q-rubric-text">Based on the provided chat, there is no information related to the detailed steps of the debugging strategy for the Unreal Engine setup error</div>
+    </div>
+  </div>
+  <div class="q-item">
+    <div class="q-header">
+      <div class="q-num">Q21</div>
+      <div class="q-text">What are the criteria or considerations that led to the decision to allocate 300MB memory per module in the multi-agent framework?</div>
+      <span class="q-badge badge-fail">✗ 0.0</span>
+    </div>
+    <div class="q-detail">Score: 0.0 | Match: 0/1 | Difficulty: hard | Source messages: None (abstention)</div>
+    <div class="q-rubric">
+      <div class="q-rubric-label">Expected Answer (Rubric)</div>
+      <div class="q-rubric-text">Based on the provided chat, there is no information related to the criteria or considerations behind allocating 300MB memory per module</div>
+    </div>
+  </div>
+  <div class="q-item">
+    <div class="q-header">
+      <div class="q-num">Q40</div>
+      <div class="q-text">What are the specific criteria or factors that led to choosing FastAPI 0.78 over other frameworks for the backend?</div>
+      <span class="q-badge badge-fail">✗ 0.0</span>
+    </div>
+    <div class="q-detail">Score: 0.0 | Match: 0/1 | Difficulty: medium | Source messages: None (abstention)</div>
+    <div class="q-rubric">
+      <div class="q-rubric-label">Expected Answer (Rubric)</div>
+      <div class="q-rubric-text">Based on the provided chat, there is no information related to the specific criteria or factors behind choosing FastAPI 0.78</div>
+    </div>
+  </div>
+  <div class="q-item">
+    <div class="q-header">
+      <div class="q-num">Q41</div>
+      <div class="q-text">What specific feedback did the team provide during the code review sessions for the unit test scripts?</div>
+      <span class="q-badge badge-fail">✗ 0.0</span>
+    </div>
+    <div class="q-detail">Score: 0.0 | Match: 0/1 | Difficulty: medium | Source messages: None (abstention)</div>
+    <div class="q-rubric">
+      <div class="q-rubric-label">Expected Answer (Rubric)</div>
+      <div class="q-rubric-text">Based on the provided chat, there is no information related to the specific feedback provided during the code review sessions</div>
+    </div>
+  </div>
+  <div class="q-item">
+    <div class="q-header">
+      <div class="q-num">Q60</div>
+      <div class="q-text">Could you provide the detailed content or key sections of the design overview document I shared with my team about modularity benefits?</div>
+      <span class="q-badge badge-fail">✗ 0.0</span>
+    </div>
+    <div class="q-detail">Score: 0.0 | Match: 0/1 | Difficulty: medium | Source messages: None (abstention)</div>
+    <div class="q-rubric">
+      <div class="q-rubric-label">Expected Answer (Rubric)</div>
+      <div class="q-rubric-text">Based on the provided chat, there is no information related to the detailed content or key sections of the design overview document</div>
+    </div>
+  </div>
+  <div class="q-item">
+    <div class="q-header">
+      <div class="q-num">Q61</div>
+      <div class="q-text">What was the outcome or feedback from the study group sessions with Rebecca and Kristy?</div>
+      <span class="q-badge badge-fail">✗ 0.0</span>
+    </div>
+    <div class="q-detail">Score: 0.0 | Match: 0/1 | Difficulty: medium | Source messages: None (abstention)</div>
+    <div class="q-rubric">
+      <div class="q-rubric-label">Expected Answer (Rubric)</div>
+      <div class="q-rubric-text">Based on the provided chat, there is no information related to the outcomes or feedback from the study group sessions with Rebecca and Kristy</div>
+    </div>
+  </div>
+  <div class="q-item">
+    <div class="q-header">
+      <div class="q-num">Q80</div>
+      <div class="q-text">What motivated my choice to focus on geometric interpretations when studying normed spaces?</div>
+      <span class="q-badge badge-fail">✗ 0.0</span>
+    </div>
+    <div class="q-detail">Score: 0.0 | Match: 0/1 | Difficulty: hard | Source messages: None (abstention)</div>
+    <div class="q-rubric">
+      <div class="q-rubric-label">Expected Answer (Rubric)</div>
+      <div class="q-rubric-text">Based on the provided chat, there is no information related to the motivation behind focusing on geometric interpretations</div>
+    </div>
+  </div>
+  <div class="q-item">
+    <div class="q-header">
+      <div class="q-num">Q81</div>
+      <div class="q-text">Can you tell me more about Devin's background and expertise in spectral theory?</div>
+      <span class="q-badge badge-fail">✗ 0.0</span>
+    </div>
+    <div class="q-detail">Score: 0.0 | Match: 0/1 | Difficulty: easy | Source messages: None (abstention)</div>
+    <div class="q-rubric">
+      <div class="q-rubric-label">Expected Answer (Rubric)</div>
+      <div class="q-rubric-text">Based on the provided chat, there is no information related to Devin's background or expertise in spectral theory</div>
+    </div>
+  </div>
+  <div class="q-item">
+    <div class="q-header">
+      <div class="q-num">Q100</div>
+      <div class="q-text">What feedback did Brian give during the 15-minute folk piece practice in the Shell Avenue living room?</div>
+      <span class="q-badge badge-fail">✗ 0.0</span>
+    </div>
+    <div class="q-detail">Score: 0.0 | Match: 0/1 | Difficulty: medium | Source messages: None (abstention)</div>
+    <div class="q-rubric">
+      <div class="q-rubric-label">Expected Answer (Rubric)</div>
+      <div class="q-rubric-text">Based on the provided chat, there is no information related to the specific feedback Brian provided during the practice</div>
+    </div>
+  </div>
+  <div class="q-item">
+    <div class="q-header">
+      <div class="q-num">Q101</div>
+      <div class="q-text">What specific techniques did John suggest during the 10-minute critique session at Harmony Hub?</div>
+      <span class="q-badge badge-fail">✗ 0.0</span>
+    </div>
+    <div class="q-detail">Score: 0.0 | Match: 0/1 | Difficulty: medium | Source messages: None (abstention)</div>
+    <div class="q-rubric">
+      <div class="q-rubric-label">Expected Answer (Rubric)</div>
+      <div class="q-rubric-text">Based on the provided chat, there is no information related to the specific techniques John suggested during the 10-minute critique session</div>
+    </div>
+  </div>
+  <div class="q-item">
+    <div class="q-header">
+      <div class="q-num">Q120</div>
+      <div class="q-text">Can you share the specific advice Samuel gave about savings strategies </div>
+      <span class="q-badge badge-fail">✗ 0.0</span>
+    </div>
+    <div class="q-detail">Score: 0.0 | Match: 0/1 | Difficulty: medium | Source messages: None (abstention)</div>
+    <div class="q-rubric">
+      <div class="q-rubric-label">Expected Answer (Rubric)</div>
+      <div class="q-rubric-text">Based on the provided chat, there is no information related to the specific advice Samuel gave about savings strategies</div>
+    </div>
+  </div>
+  <div class="q-item">
+    <div class="q-header">
+      <div class="q-num">Q121</div>
+      <div class="q-text">Could you share the key points from the free YouTube pottery tutorial I watched?</div>
+      <span class="q-badge badge-fail">✗ 0.0</span>
+    </div>
+    <div class="q-detail">Score: 0.0 | Match: 0/1 | Difficulty: hard | Source messages: None (abstention)</div>
+    <div class="q-rubric">
+      <div class="q-rubric-label">Expected Answer (Rubric)</div>
+      <div class="q-rubric-text">Based on the provided chat, there is no information related to the key points of the YouTube pottery tutorial you watched</div>
+    </div>
+  </div>
+  <div class="q-item">
+    <div class="q-header">
+      <div class="q-num">Q140</div>
+      <div class="q-text">What specific maintenance steps did I learn from the YouTube videos about checking oil levels?</div>
+      <span class="q-badge badge-fail">✗ 0.0</span>
+    </div>
+    <div class="q-detail">Score: 0.0 | Match: 0/1 | Difficulty: hard | Source messages: None (abstention)</div>
+    <div class="q-rubric">
+      <div class="q-rubric-label">Expected Answer (Rubric)</div>
+      <div class="q-rubric-text">Based on the provided chat, there is no information related to the specific maintenance steps learned from the YouTube videos about checking oil levels</div>
+    </div>
+  </div>
+  <div class="q-item">
+    <div class="q-header">
+      <div class="q-num">Q141</div>
+      <div class="q-text">Could you provide details about the local fair near Normal on I-55, such as the types of food stalls or events featured?</div>
+      <span class="q-badge badge-fail">✗ 0.0</span>
+    </div>
+    <div class="q-detail">Score: 0.0 | Match: 0/1 | Difficulty: medium | Source messages: None (abstention)</div>
+    <div class="q-rubric">
+      <div class="q-rubric-label">Expected Answer (Rubric)</div>
+      <div class="q-rubric-text">Based on the provided chat, there is no information related to the specific details of the local fair near Normal on I-55</div>
+    </div>
+  </div>
+  <div class="q-item">
+    <div class="q-header">
+      <div class="q-num">Q160</div>
+      <div class="q-text">What are the steps for filing a claim with Allianz insurance as per the policy?</div>
+      <span class="q-badge badge-fail">✗ 0.0</span>
+    </div>
+    <div class="q-detail">Score: 0.0 | Match: 0/1 | Difficulty: hard | Source messages: None (abstention)</div>
+    <div class="q-rubric">
+      <div class="q-rubric-label">Expected Answer (Rubric)</div>
+      <div class="q-rubric-text">Based on the provided chat, there is no information related to the exact steps for filing a claim with Allianz insurance</div>
+    </div>
+  </div>
+  <div class="q-item">
+    <div class="q-header">
+      <div class="q-num">Q161</div>
+      <div class="q-text">What were the factors considered when deciding to extend the dolphin watching time to 1.5 hours?</div>
+      <span class="q-badge badge-fail">✗ 0.0</span>
+    </div>
+    <div class="q-detail">Score: 0.0 | Match: 0/1 | Difficulty: medium | Source messages: None (abstention)</div>
+    <div class="q-rubric">
+      <div class="q-rubric-label">Expected Answer (Rubric)</div>
+      <div class="q-rubric-text">Based on the provided chat, there is no information related to the factors considered for extending dolphin watching time</div>
+    </div>
+  </div>
+  <div class="q-item">
+    <div class="q-header">
+      <div class="q-num">Q180</div>
+      <div class="q-text">Could you provide the exact itinerary and schedule for the virtual tour of the Grand Wailea Resort?</div>
+      <span class="q-badge badge-fail">✗ 0.0</span>
+    </div>
+    <div class="q-detail">Score: 0.0 | Match: 0/1 | Difficulty: medium | Source messages: None (abstention)</div>
+    <div class="q-rubric">
+      <div class="q-rubric-label">Expected Answer (Rubric)</div>
+      <div class="q-rubric-text">Based on the provided chat, there is no information related to the exact itinerary or schedule of the virtual tour of the Grand Wailea Resort</div>
+    </div>
+  </div>
+  <div class="q-item">
+    <div class="q-header">
+      <div class="q-num">Q181</div>
+      <div class="q-text">What was discussed during the Zoom call with Pamela about travel logistics for her group of 15 friends?</div>
+      <span class="q-badge badge-fail">✗ 0.0</span>
+    </div>
+    <div class="q-detail">Score: 0.0 | Match: 0/1 | Difficulty: medium | Source messages: None (abstention)</div>
+    <div class="q-rubric">
+      <div class="q-rubric-label">Expected Answer (Rubric)</div>
+      <div class="q-rubric-text">Based on the provided chat, there is no information related to the specific discussions during the Zoom call with Pamela</div>
+    </div>
+  </div>
+
+<h3 id="contradiction_resolution" style="color:var(--gold-bright);margin-top:2rem;padding-top:1rem;border-top:1px solid rgba(201,162,75,0.15);">Contradiction Resolution — 100.0% (20.0/20)</h3>
+  <div class="q-item">
+    <div class="q-header">
+      <div class="q-num">Q2</div>
+      <div class="q-text">Have I set up diagnostic logs to capture shard distribution errors in my sharding implementation?</div>
+      <span class="q-badge badge-pass">✓ 1.0</span>
+    </div>
+    <div class="q-detail">Score: 1.0 | Match: 4/4 | Difficulty: clear | Source messages: Yes</div>
+    <div class="q-rubric">
+      <div class="q-rubric-label">Expected Answer (Rubric)</div>
+      <div class="q-rubric-text">LLM response should state: there is contradictory information; LLM response should mention: you mentioned setting up diagnostic logs for shard distribution errors; LLM response should mention: you said you've never set up such logs; LLM response should mention: which statement is correct?</div>
+    </div>
+  </div>
+  <div class="q-item">
+    <div class="q-header">
+      <div class="q-num">Q3</div>
+      <div class="q-text">Do I usually include exact error messages when I ask about debugging strategies for vector lookups during dense search integration?</div>
+      <span class="q-badge badge-pass">✓ 1.0</span>
+    </div>
+    <div class="q-detail">Score: 1.0 | Match: 4/4 | Difficulty: clear | Source messages: Yes</div>
+    <div class="q-rubric">
+      <div class="q-rubric-label">Expected Answer (Rubric)</div>
+      <div class="q-rubric-text">LLM response should state: there is contradictory information; LLM response should mention: You said that exact error messages are always included when discussing debugging strategies; LLM response should mention: you also mentioned never having logged errors for vector lookups during dense search integration; LLM response should mention: which statement is correct?</div>
+    </div>
+  </div>
+  <div class="q-item">
+    <div class="q-header">
+      <div class="q-num">Q22</div>
+      <div class="q-text">Have I ever automated build notifications in Jenkins as part of my deployment process?</div>
+      <span class="q-badge badge-pass">✓ 1.0</span>
+    </div>
+    <div class="q-detail">Score: 1.0 | Match: 4/4 | Difficulty: clear | Source messages: Yes</div>
+    <div class="q-rubric">
+      <div class="q-rubric-label">Expected Answer (Rubric)</div>
+      <div class="q-rubric-text">LLM response should state: there is contradictory information; LLM response should mention: You said you have never automated any build notifications in Jenkins; LLM response should mention: you also mentioned integrating multiple Jenkins plugins; LLM response should mention: which statement is correct?</div>
+    </div>
+  </div>
+  <div class="q-item">
+    <div class="q-header">
+      <div class="q-num">Q23</div>
+      <div class="q-text">Have I revised my data flow designs for this project?</div>
+      <span class="q-badge badge-pass">✓ 1.0</span>
+    </div>
+    <div class="q-detail">Score: 1.0 | Match: 4/4 | Difficulty: clear | Source messages: Yes</div>
+    <div class="q-rubric">
+      <div class="q-rubric-label">Expected Answer (Rubric)</div>
+      <div class="q-rubric-text">LLM response should state: there is contradictory information; LLM response should mention: You said you've iterated on your data flow designs multiple times; LLM response should mention: you also mentioned that you have never revised any data flow designs; LLM response should mention: which statement is correct?</div>
+    </div>
+  </div>
+  <div class="q-item">
+    <div class="q-header">
+      <div class="q-num">Q42</div>
+      <div class="q-text">Have I shared any protocol optimization tips with my team before?</div>
+      <span class="q-badge badge-pass">✓ 1.0</span>
+    </div>
+    <div class="q-detail">Score: 1.0 | Match: 4/4 | Difficulty: clear | Source messages: Yes</div>
+    <div class="q-rubric">
+      <div class="q-rubric-label">Expected Answer (Rubric)</div>
+      <div class="q-rubric-text">LLM response should state: there is contradictory information; LLM response should mention: You said you've never shared any protocol optimization tips with your team; LLM response should mention: you also mentioned posting 15 protocol optimization tips highlighting faster delivery; LLM response should mention: which statement is correct?</div>
+    </div>
+  </div>
+  <div class="q-item">
+    <div class="q-header">
+      <div class="q-num">Q43</div>
+      <div class="q-text">Have I ever encrypted behavior logs to protect data privacy?</div>
+      <span class="q-badge badge-pass">✓ 1.0</span>
+    </div>
+    <div class="q-detail">Score: 1.0 | Match: 4/4 | Difficulty: clear | Source messages: Yes</div>
+    <div class="q-rubric">
+      <div class="q-rubric-label">Expected Answer (Rubric)</div>
+      <div class="q-rubric-text">LLM response should state: there is contradictory information; LLM response should mention: You said you are encrypting behavior logs and protecting data privacy; LLM response should mention: you also mentioned that you've never encrypted any behavior logs; LLM response should mention: which statement is correct?</div>
+    </div>
+  </div>
+  <div class="q-item">
+    <div class="q-header">
+      <div class="q-num">Q62</div>
+      <div class="q-text">Have I ever formulated heat equation problems before?</div>
+      <span class="q-badge badge-pass">✓ 1.0</span>
+    </div>
+    <div class="q-detail">Score: 1.0 | Match: 4/4 | Difficulty: clear | Source messages: Yes</div>
+    <div class="q-rubric">
+      <div class="q-rubric-label">Expected Answer (Rubric)</div>
+      <div class="q-rubric-text">LLM response should state: there is contradictory information; LLM response should mention: You said you have never formulated any heat equation problems before; LLM response should mention: you also mentioned you completed 5 heat equation problems; LLM response should mention: which statement is correct?</div>
+    </div>
+  </div>
+  <div class="q-item">
+    <div class="q-header">
+      <div class="q-num">Q63</div>
+      <div class="q-text">Have I ever constructed a Green's function for the operator L = d²/dx² - k² on the interval [0,1]?</div>
+      <span class="q-badge badge-pass">✓ 1.0</span>
+    </div>
+    <div class="q-detail">Score: 1.0 | Match: 4/4 | Difficulty: clear | Source messages: Yes</div>
+    <div class="q-rubric">
+      <div class="q-rubric-label">Expected Answer (Rubric)</div>
+      <div class="q-rubric-text">LLM response should state: there is contradictory information; LLM response should mention: You said you have constructed a Green's function for d²/dx² - 1; LLM response should mention: you mentioned that you have never constructed any Green's function for L = d²/dx² - k²; LLM response should mention: which statement is correct?</div>
+    </div>
+  </div>
+  <div class="q-item">
+    <div class="q-header">
+      <div class="q-num">Q82</div>
+      <div class="q-text">Have I ever discussed norm properties with Devin or anyone else before?</div>
+      <span class="q-badge badge-pass">✓ 1.0</span>
+    </div>
+    <div class="q-detail">Score: 1.0 | Match: 4/4 | Difficulty: clear | Source messages: Yes</div>
+    <div class="q-rubric">
+      <div class="q-rubric-label">Expected Answer (Rubric)</div>
+      <div class="q-rubric-text">LLM response should state: there is contradictory information; LLM response should mention: you mentioned discussing norm properties with Devin; LLM response should mention: you said you've never discussed them with Devin or anyone else; LLM response should mention: which statement is correct?</div>
+    </div>
+  </div>
+  <div class="q-item">
+    <div class="q-header">
+      <div class="q-num">Q83</div>
+      <div class="q-text">Have I ever discussed self-adjoint operator extensions with Devin?</div>
+      <span class="q-badge badge-pass">✓ 1.0</span>
+    </div>
+    <div class="q-detail">Score: 1.0 | Match: 4/4 | Difficulty: clear | Source messages: Yes</div>
+    <div class="q-rubric">
+      <div class="q-rubric-label">Expected Answer (Rubric)</div>
+      <div class="q-rubric-text">LLM response should state: there is contradictory information; LLM response should mention: You said you have discussed self-adjoint operator extensions with Devin; LLM response should mention: you also mentioned that you have never engaged in any discussions about this topic with him; LLM response should mention: which statement is correct?</div>
+    </div>
+  </div>
+  <div class="q-item">
+    <div class="q-header">
+      <div class="q-num">Q102</div>
+      <div class="q-text">Have I ever adjusted my chair height to help prevent wrist strain during my practice sessions?</div>
+      <span class="q-badge badge-pass">✓ 1.0</span>
+    </div>
+    <div class="q-detail">Score: 1.0 | Match: 4/4 | Difficulty: clear | Source messages: Yes</div>
+    <div class="q-rubric">
+      <div class="q-rubric-label">Expected Answer (Rubric)</div>
+      <div class="q-rubric-text">LLM response should state: there is contradictory information; LLM response should mention: You said you've adjusted your chair height by 3 inches to prevent wrist strain; LLM response should mention: you also mentioned that you've never adjusted your chair height; LLM response should mention: which statement is correct?</div>
+    </div>
+  </div>
+  <div class="q-item">
+    <div class="q-header">
+      <div class="q-num">Q103</div>
+      <div class="q-text">Have I ever joined any violin-related groups on Reddit?</div>
+      <span class="q-badge badge-pass">✓ 1.0</span>
+    </div>
+    <div class="q-detail">Score: 1.0 | Match: 4/4 | Difficulty: clear | Source messages: Yes</div>
+    <div class="q-rubric">
+      <div class="q-rubric-label">Expected Answer (Rubric)</div>
+      <div class="q-rubric-text">LLM response should state: there is contradictory information; LLM response should mention: You said you have never joined any violin-related groups on Reddit; LLM response should mention: you also mentioned joining the "Beginner Musicians" forum; LLM response should mention: which statement is correct?</div>
+    </div>
+  </div>
+  <div class="q-item">
+    <div class="q-header">
+      <div class="q-num">Q122</div>
+      <div class="q-text">Have I ever moved my old couch to storage?</div>
+      <span class="q-badge badge-pass">✓ 1.0</span>
+    </div>
+    <div class="q-detail">Score: 1.0 | Match: 4/4 | Difficulty: clear | Source messages: Yes</div>
+    <div class="q-rubric">
+      <div class="q-rubric-label">Expected Answer (Rubric)</div>
+      <div class="q-rubric-text">LLM response should state: there is contradictory information; LLM response should mention: You said you moved your old couch to storage; LLM response should mention: you also mentioned that you have never moved your old couch to storage; LLM response should mention: which statement is correct?</div>
+    </div>
+  </div>
+  <div class="q-item">
+    <div class="q-header">
+      <div class="q-num">Q123</div>
+      <div class="q-text">Have I ever signed up for any community volunteering events before?</div>
+      <span class="q-badge badge-pass">✓ 1.0</span>
+    </div>
+    <div class="q-detail">Score: 1.0 | Match: 4/4 | Difficulty: clear | Source messages: Yes</div>
+    <div class="q-rubric">
+      <div class="q-rubric-label">Expected Answer (Rubric)</div>
+      <div class="q-rubric-text">LLM response should state: there is contradictory information; LLM response should mention: You said you have never signed up for any community volunteering events; LLM response should mention: you also referred to signing up online for a food drive; LLM response should mention: which statement is correct?</div>
+    </div>
+  </div>
+  <div class="q-item">
+    <div class="q-header">
+      <div class="q-num">Q142</div>
+      <div class="q-text">Have I driven hybrid vehicles before?</div>
+      <span class="q-badge badge-pass">✓ 1.0</span>
+    </div>
+    <div class="q-detail">Score: 1.0 | Match: 4/4 | Difficulty: clear | Source messages: Yes</div>
+    <div class="q-rubric">
+      <div class="q-rubric-label">Expected Answer (Rubric)</div>
+      <div class="q-rubric-text">LLM response should state: there is contradictory information; LLM response should mention: You said you are getting used to the hybrid's smooth acceleration; LLM response should mention: you also mentioned that you've never driven a hybrid before; LLM response should mention: which statement is correct?</div>
+    </div>
+  </div>
+  <div class="q-item">
+    <div class="q-header">
+      <div class="q-num">Q143</div>
+      <div class="q-text">Have I sent any messages to my mom during this trip?</div>
+      <span class="q-badge badge-pass">✓ 1.0</span>
+    </div>
+    <div class="q-detail">Score: 1.0 | Match: 4/4 | Difficulty: clear | Source messages: Yes</div>
+    <div class="q-rubric">
+      <div class="q-rubric-label">Expected Answer (Rubric)</div>
+      <div class="q-rubric-text">LLM response should state: there is contradictory information; LLM response should mention: You said you sent a WhatsApp text to your mom about your progress; LLM response should mention: you also mentioned that you have never sent any messages to her during this trip; LLM response should mention: which statement is correct?</div>
+    </div>
+  </div>
+  <div class="q-item">
+    <div class="q-header">
+      <div class="q-num">Q162</div>
+      <div class="q-text">Have I ever initiated the booking process for Soneva Jani or any other resort?</div>
+      <span class="q-badge badge-pass">✓ 1.0</span>
+    </div>
+    <div class="q-detail">Score: 1.0 | Match: 4/4 | Difficulty: clear | Source messages: Yes</div>
+    <div class="q-rubric">
+      <div class="q-rubric-label">Expected Answer (Rubric)</div>
+      <div class="q-rubric-text">LLM response should state: there is contradictory information; LLM response should mention: You said you have never initiated any booking process for Soneva Jani; LLM response should mention: you said you have started the booking process for Soneva Jani; LLM response should mention: which statement is correct?</div>
+    </div>
+  </div>
+  <div class="q-item">
+    <div class="q-header">
+      <div class="q-num">Q163</div>
+      <div class="q-text">Have I ever taken a seaplane transfer during my trips?</div>
+      <span class="q-badge badge-pass">✓ 1.0</span>
+    </div>
+    <div class="q-detail">Score: 1.0 | Match: 4/4 | Difficulty: clear | Source messages: Yes</div>
+    <div class="q-rubric">
+      <div class="q-rubric-label">Expected Answer (Rubric)</div>
+      <div class="q-rubric-text">LLM response should state: there is contradictory information; LLM response should mention: You said you have never taken a seaplane transfer during any of your trips; LLM response should mention: you also referred to safety experiences during seaplane transfers; LLM response should mention: which statement is correct?</div>
+    </div>
+  </div>
+  <div class="q-item">
+    <div class="q-header">
+      <div class="q-num">Q182</div>
+      <div class="q-text">Has Pamela ever helped coordinate with vendors or saved setup time during my events?</div>
+      <span class="q-badge badge-pass">✓ 1.0</span>
+    </div>
+    <div class="q-detail">Score: 1.0 | Match: 4/4 | Difficulty: clear | Source messages: Yes</div>
+    <div class="q-rubric">
+      <div class="q-rubric-label">Expected Answer (Rubric)</div>
+      <div class="q-rubric-text">LLM response should state: there is contradictory information; LLM response should mention: You said Pamela has never helped coordinate with vendors; LLM response should mention: you also mentioned that she arrived to help coordinate with vendors; LLM response should mention: which statement is correct?</div>
+    </div>
+  </div>
+  <div class="q-item">
+    <div class="q-header">
+      <div class="q-num">Q183</div>
+      <div class="q-text">Have I ever coordinated with volunteers to assist with guest relocations?</div>
+      <span class="q-badge badge-pass">✓ 1.0</span>
+    </div>
+    <div class="q-detail">Score: 1.0 | Match: 4/4 | Difficulty: clear | Source messages: Yes</div>
+    <div class="q-rubric">
+      <div class="q-rubric-label">Expected Answer (Rubric)</div>
+      <div class="q-rubric-text">LLM response should state: there is contradictory information; LLM response should mention: You said that Pamela rallied volunteers to help with guest relocations; LLM response should mention: you also mentioned that you have never coordinated with any volunteers; LLM response should mention: which statement is correct?</div>
+    </div>
+  </div>
+
+<h3 id="event_ordering" style="color:var(--gold-bright);margin-top:2rem;padding-top:1rem;border-top:1px solid rgba(201,162,75,0.15);">Event Ordering — 36.1% (7.2/20)</h3>
+  <div class="q-item">
+    <div class="q-header">
+      <div class="q-num">Q4</div>
+      <div class="q-text">How did my discussions about the development phases of our RAG system progress from 2024-08-01 to 2024-10-22 in order? Mention ONLY and ONLY twenty items.</div>
+      <span class="q-badge badge-partial">◐ 0.6</span>
+    </div>
+    <div class="q-detail">Score: 0.6 | Match: 12/20 | Difficulty: hard | Source messages: Yes</div>
+    <div class="q-rubric">
+      <div class="q-rubric-label">Expected Answer (Rubric)</div>
+      <div class="q-rubric-text">Core ingestion pipeline initiation; Batch vs streaming ingestion strategies; Metadata extraction and normalization; Vectorization and indexing workflows; Vector database cluster setup; Sparse retrieval index implementation; Core API scaffolding; Authentication and authorization integration; Logging and monitoring foundation; Infrastructure as code implementation; Hybrid sparse-dense retrieval prototyping; Dense vector search with approximate nearest neighbors; Combining retrieval scores for hybrid ranking; Query pipeline prototyping with hybrid retrieval; Query rewriting for improved recall; Evaluation metrics and relevance testing; Extending APIs for hybrid search; Multi-language tokenization; Caching strategies for frequent queries; Logging query performance and errors</div>
+    </div>
+  </div>
+  <div class="q-item">
+    <div class="q-header">
+      <div class="q-num">Q5</div>
+      <div class="q-text">Can you reconstruct the sequence in which I brought up the various error types and their handling challenges from 2024-11-01 to 2025-01-21 in order? Mention ONLY and ONLY eleven items.</div>
+      <span class="q-badge badge-pass">✓ 1.0</span>
+    </div>
+    <div class="q-detail">Score: 1.0 | Match: 11/11 | Difficulty: hard | Source messages: Yes</div>
+    <div class="q-rubric">
+      <div class="q-rubric-label">Expected Answer (Rubric)</div>
+      <div class="q-rubric-text">Token limit and segmentation errors; Context window resizing and mismatch errors; Index scoring errors; Rerank score and feedback parse errors; Version conflict errors; Metric calculation and spell check errors; Encryption key and documentation format errors; Query parse and synonym mismatch errors; Intent reform and encoding mismatch errors; Language detection and vector alignment errors; Stemming rule, relevance score, and code switch errors</div>
+    </div>
+  </div>
+  <div class="q-item">
+    <div class="q-header">
+      <div class="q-num">Q24</div>
+      <div class="q-text">Can you list the order in which I brought up different features and version updates of the CARLA Simulator from 2024-07-01 to 2024-07-29? Mention ONLY and ONLY ten items.</div>
+      <span class="q-badge badge-partial">◐ 0.1</span>
+    </div>
+    <div class="q-detail">Score: 0.1 | Match: 1/10 | Difficulty: medium | Source messages: None (abstention)</div>
+    <div class="q-rubric">
+      <div class="q-rubric-label">Expected Answer (Rubric)</div>
+      <div class="q-rubric-text">Python 3.7 API support and environment setup; API support for 10 sensor types in v0.9.14; 15 pre-built urban maps in v0.9.15; Lidar with 128 channels in v0.9.17; GPU requirements for 4K rendering in v0.9.18; RAM requirements for multi-agent scenarios in v0.9.19; Dataset support with 10,000 annotated frames in v0.9.20; Anonymization for data logs in v0.9.21; RL support for 50 concurrent agents in v0.9.22; Enhanced sensor configurations and Unreal Engine integration in v0.9.23 to v0.9.27</div>
+    </div>
+  </div>
+  <div class="q-item">
+    <div class="q-header">
+      <div class="q-num">Q25</div>
+      <div class="q-text">Can you list the order in which I brought up different aspects of my deployment and CI/CD pipeline setup from 2025-02-01 to 2025-02-25, in order? Mention ONLY and ONLY twelve items.</div>
+      <span class="q-badge badge-partial">◐ 0.08</span>
+    </div>
+    <div class="q-detail">Score: 0.08 | Match: 1/12 | Difficulty: medium | Source messages: None (abstention)</div>
+    <div class="q-rubric">
+      <div class="q-rubric-label">Expected Answer (Rubric)</div>
+      <div class="q-rubric-text">Jenkins initial setup with retry logic; Docker and environment variable configuration; AWS instance provisioning and CloudFormation; AWS ELB load balancing and scalability; Jenkins security scans and monitoring; AWS S3 backup deployment and availability; GitHub Actions release automation; Jenkins auth checks integration; Jenkins pipeline optimization and doc builds; Log aggregation environment setup with Docker/Kubernetes; Jenkins incident scripts and error handling; MongoDB integration for build logs</div>
+    </div>
+  </div>
+  <div class="q-item">
+    <div class="q-header">
+      <div class="q-num">Q44</div>
+      <div class="q-text">Can you list the order in which I brought up different development phases and technical focuses for my multi-agent AI platform from 2024-08-01 to 2024-09-19, in order? Mention ONLY and ONLY twenty items.</div>
+      <span class="q-badge badge-pass">✓ 1.0</span>
+    </div>
+    <div class="q-detail">Score: 1.0 | Match: 20/20 | Difficulty: medium | Source messages: Yes</div>
+    <div class="q-rubric">
+      <div class="q-rubric-label">Expected Answer (Rubric)</div>
+      <div class="q-rubric-text">Infrastructure setup and backend server frameworks; Database schema design for agent states; Implementation of core communication protocols; Development of basic API endpoints for agent control; Containerization and orchestration setup; Scaffolding the initial environment simulation; Implementation of authentication and authorization; Establishing logging and monitoring infrastructure; Integration of version control with CI; Building a basic frontend skeleton for dashboards; Kicking off initial prototyping for agent communication; Defining shared and individual goal structures; Working on synchronization and conflict resolution for agent goals; Developing a prototype UI for goal visualization; Simulating cooperation and competition among agents; Logging agent interactions for analysis; Extending APIs for goal management; Implementing error handling in communication layers; Writing unit tests for communication modules; Integrating the communication prototype with core infrastructure</div>
+    </div>
+  </div>
+  <div class="q-item">
+    <div class="q-header">
+      <div class="q-num">Q45</div>
+      <div class="q-text">Can you list the order in which I brought up different technical challenges and debugging topics related to my multi-agent AI platform from 2025-01-01 to 2025-01-30, in order? Mention ONLY and ONLY ten items.</div>
+      <span class="q-badge badge-partial">◐ 0.1</span>
+    </div>
+    <div class="q-detail">Score: 0.1 | Match: 1/10 | Difficulty: medium | Source messages: None (abstention)</div>
+    <div class="q-rubric">
+      <div class="q-rubric-label">Expected Answer (Rubric)</div>
+      <div class="q-rubric-text">High CPU usage with PyTorch; Message delay in MQTT; Function redundancy in FastAPI simulation; Node overload and load balancing in Kubernetes; Memory leak in PyTorch simulations; Race condition in parallel tasks with RLlib; Cache miss errors with Redis; High latency and scenario mismatch in MQTT and UAT; Test failure errors in pytest regression tests; Data discrepancy in metrics compilation</div>
+    </div>
+  </div>
+  <div class="q-item">
+    <div class="q-header">
+      <div class="q-num">Q64</div>
+      <div class="q-text">Can you list the order in which I brought up different aspects of Green's functions and related PDE solution methods from 2025-03-01 to 2025-03-31, in order? Mention ONLY and ONLY nine items.</div>
+      <span class="q-badge badge-pass">✓ 1.0</span>
+    </div>
+    <div class="q-detail">Score: 1.0 | Match: 9/9 | Difficulty: medium | Source messages: Yes</div>
+    <div class="q-rubric">
+      <div class="q-rubric-label">Expected Answer (Rubric)</div>
+      <div class="q-rubric-text">Definition and basic understanding; Construction methods and boundary conditions; Green's identities and integral formulas; Solving inhomogeneous PDEs and boundary incorporation; Symmetry and reciprocity properties; Connection to eigenfunction expansions; Application to Laplace and Poisson equations; Analytical and computational approaches; Limitations and generalizations</div>
+    </div>
+  </div>
+  <div class="q-item">
+    <div class="q-header">
+      <div class="q-num">Q65</div>
+      <div class="q-text">Can you list the order in which I brought up different aspects of my PDE preparation process from 2024-07-01 to 2024-07-27, in order? Mention ONLY and ONLY eleven items.</div>
+      <span class="q-badge badge-pass">✓ 1.0</span>
+    </div>
+    <div class="q-detail">Score: 1.0 | Match: 11/11 | Difficulty: medium | Source messages: Yes</div>
+    <div class="q-rubric">
+      <div class="q-rubric-label">Expected Answer (Rubric)</div>
+      <div class="q-rubric-text">Starting journey and skill assessment; Calculus and algebra foundation; Diagnostic testing; Learning goals from assessments; Finalizing preparation phase; Resource curation; Study scheduling; Symbolic computation tools; Glossary creation; Milestones and tracking; Study group and self-assessment</div>
+    </div>
+  </div>
+  <div class="q-item">
+    <div class="q-header">
+      <div class="q-num">Q84</div>
+      <div class="q-text">Can you list the order in which I brought up different foundational and advanced concepts in Functional Analysis from 2024-08-01 to 2024-10-22, in order? Mention ONLY and ONLY twenty items.</div>
+      <span class="q-badge badge-partial">◐ 0.05</span>
+    </div>
+    <div class="q-detail">Score: 0.05 | Match: 1/20 | Difficulty: medium | Source messages: None (abstention)</div>
+    <div class="q-rubric">
+      <div class="q-rubric-label">Expected Answer (Rubric)</div>
+      <div class="q-rubric-text">Foundations of normed and Banach spaces; Examples of normed spaces and ℓ^p norms; Completeness and Cauchy sequences in Banach spaces; Properties of norms and metrics; Equivalence of norms and topology; Continuous linear functionals; Open and closed sets in normed spaces; Convergence and Cauchy sequences linked to completeness; Proofs of completeness; Completeness failure examples; Introduction to Hilbert spaces; Parallelogram law; Orthogonality in inner product spaces; Projection theorem; Riesz representation theorem; Examples of Hilbert spaces; Completeness and characterization of Hilbert spaces; Gram-Schmidt orthogonalization; Bessel's inequality and Parseval's identity; Hilbert space applications to Fourier series</div>
+    </div>
+  </div>
+  <div class="q-item">
+    <div class="q-header">
+      <div class="q-num">Q85</div>
+      <div class="q-text">Can you list the order in which I brought up different key concepts related to linear operators and their properties from 2024-11-01 to 2025-01-21, in order? Mention ONLY and ONLY twenty items.</div>
+      <span class="q-badge badge-partial">◐ 0.05</span>
+    </div>
+    <div class="q-detail">Score: 0.05 | Match: 1/20 | Difficulty: medium | Source messages: None (abstention)</div>
+    <div class="q-rubric">
+      <div class="q-rubric-label">Expected Answer (Rubric)</div>
+      <div class="q-rubric-text">Boundedness and properties of linear operators; Operator norms and continuity equivalence; Kernel and range of operators; Adjoint operators in Hilbert spaces; Invertibility and bounded inverse theorem; Operator algebra basics and composition; Compact operators and properties; Finite rank operators classification; Operator topologies and convergence; Elementary operator equations; Spectral theory for bounded operators; Spectral radius and implications; Types of spectrum classification; Spectral mapping theorem; Gelfand theory and spectral implications; Spectral theorem for normal operators; Functional calculus basics; Examples like shift and multiplication operators; Spectral decomposition concepts; Spectral theory applied to differential operators</div>
+    </div>
+  </div>
+  <div class="q-item">
+    <div class="q-header">
+      <div class="q-num">Q104</div>
+      <div class="q-text">Can you walk me through the order in which I brought up different ideas about incorporating my musical interests into university events and lectures from January 1, 2021 to February 25, 2021, in order? Mention ONLY and ONLY seven items.</div>
+      <span class="q-badge badge-partial">◐ 0.14</span>
+    </div>
+    <div class="q-detail">Score: 0.14 | Match: 1/7 | Difficulty: medium | Source messages: None (abstention)</div>
+    <div class="q-rubric">
+      <div class="q-rubric-label">Expected Answer (Rubric)</div>
+      <div class="q-rubric-text">Ukulele skills enhancing lectures at New Jeffreytown University (Campus Plaza); Integrating ukulele into cultural lecture at Campus Hall; Ukulele demo at Campus Plaza for colleagues; Ukulele snippet for lecture at Campus Hall; Mentioning ukulele learning in seminar at Campus Plaza; Ukulele workshop for students at Campus Hall; Dreaming of small gigs at Campus Plaza</div>
+    </div>
+  </div>
+  <div class="q-item">
+    <div class="q-header">
+      <div class="q-num">Q105</div>
+      <div class="q-text">Can you walk me through the order in which I brought up different ways my family and tutor have supported my ukulele practice from March 1, 2021 to April 24, 2021, in order? Mention ONLY and ONLY six items.</div>
+      <span class="q-badge badge-partial">◐ 0.17</span>
+    </div>
+    <div class="q-detail">Score: 0.17 | Match: 1/6 | Difficulty: medium | Source messages: None (abstention)</div>
+    <div class="q-rubric">
+      <div class="q-rubric-label">Expected Answer (Rubric)</div>
+      <div class="q-rubric-text">Tutor John's practice planning and confidence tips; Husband Brian's equipment setup and material organization; Daughter Barbara's decor selection and timing support; Son Christian's equipment testing and motivational videos; Son Marvin's cheering and goal review encouragement; Keith's accountability calls and motivational resources</div>
+    </div>
+  </div>
+  <div class="q-item">
+    <div class="q-header">
+      <div class="q-num">Q124</div>
+      <div class="q-text">Can you walk me through the order in which I brought up different aspects of my relationship and shared activities with Jenna from May 1, 2022 to August 27, 2022, in order? Mention ONLY and ONLY eight items.</div>
+      <span class="q-badge badge-partial">◐ 0.12</span>
+    </div>
+    <div class="q-detail">Score: 0.12 | Match: 1/8 | Difficulty: medium | Source messages: None (abstention)</div>
+    <div class="q-rubric">
+      <div class="q-rubric-label">Expected Answer (Rubric)</div>
+      <div class="q-rubric-text">Pottery class discussions; Jenna's driving offer and support; Encouragement during pottery progress; Photographing pottery and confidence boost; Coastal trip brainstorming; Travel bookings and preparations; Trip experiences and shared moments; Photo review and nostalgic reflections</div>
+    </div>
+  </div>
+  <div class="q-item">
+    <div class="q-header">
+      <div class="q-num">Q125</div>
+      <div class="q-text">Can you walk me through the order in which I brought up different aspects of my fitness and financial discussions with Jenna from May 3, 2021 to September 7, 2021, in order? Mention ONLY and ONLY ten items.</div>
+      <span class="q-badge badge-partial">◐ 0.1</span>
+    </div>
+    <div class="q-detail">Score: 0.1 | Match: 1/10 | Difficulty: medium | Source messages: None (abstention)</div>
+    <div class="q-rubric">
+      <div class="q-rubric-label">Expected Answer (Rubric)</div>
+      <div class="q-rubric-text">Fitness focus and workout ideas over coffee; Weekend walk at Sunset Beach; Planning hikes and praising consistency over tea; Hiking at Reef Trail and bonding; Running at Coral Beach and setting goals; Budget discussion over coffee at Ocean View Lounge; Grocery budget cap and shopping support; Celebrating savings and budget dates; Retirement goals and investment discussions; Financial progress, insurance quotes, and planning next steps</div>
+    </div>
+  </div>
+  <div class="q-item">
+    <div class="q-header">
+      <div class="q-num">Q144</div>
+      <div class="q-text">Can you walk me through the order in which I brought up different personal feelings and concerns about my road trip from May 1, 2022 to October 3, 2022, in order? Mention ONLY and ONLY eight items.</div>
+      <span class="q-badge badge-partial">◐ 0.12</span>
+    </div>
+    <div class="q-detail">Score: 0.12 | Match: 1/8 | Difficulty: medium | Source messages: None (abstention)</div>
+    <div class="q-rubric">
+      <div class="q-rubric-label">Expected Answer (Rubric)</div>
+      <div class="q-rubric-text">Excitement and thrill; Anxiety about missing sights; Frustration with reviews; Anxiety about road conditions; Anxiety about gas and signal; Stress about vehicle and rentals; Comfort with hybrid choice; Balancing scenic and practical concerns</div>
+    </div>
+  </div>
+  <div class="q-item">
+    <div class="q-header">
+      <div class="q-num">Q145</div>
+      <div class="q-text">Can you list the order in which I brought up different aspects of my transportation and navigation plans from January 2, 2023 to March 10, 2023, in order? Mention ONLY and ONLY five items.</div>
+      <span class="q-badge badge-partial">◐ 0.2</span>
+    </div>
+    <div class="q-detail">Score: 0.2 | Match: 1/5 | Difficulty: easy | Source messages: None (abstention)</div>
+    <div class="q-rubric">
+      <div class="q-rubric-label">Expected Answer (Rubric)</div>
+      <div class="q-rubric-text">Initial rental pickup confirmation and deposit discussion; Email confirmation and insurance verification; Phone call confirmation and Terminal 5 pickup details; Vehicle inspection and tire check discussion; Offline maps download and GPS navigation accuracy</div>
+    </div>
+  </div>
+  <div class="q-item">
+    <div class="q-header">
+      <div class="q-num">Q164</div>
+      <div class="q-text">Can you walk me through the order in which I brought up various preparations and plans for our trip from September 23, 2024 to October 3, 2024, in order? Mention ONLY and ONLY ten items.</div>
+      <span class="q-badge badge-pass">✓ 1.0</span>
+    </div>
+    <div class="q-detail">Score: 1.0 | Match: 10/10 | Difficulty: medium | Source messages: Yes</div>
+    <div class="q-rubric">
+      <div class="q-rubric-label">Expected Answer (Rubric)</div>
+      <div class="q-rubric-text">Booking confirmation; Transportation timing; Insurance review; Activity allocation; Luxury items; Health appointments; Home security; Trip expectations; Booking reconfirmation; Itinerary finalization</div>
+    </div>
+  </div>
+  <div class="q-item">
+    <div class="q-header">
+      <div class="q-num">Q165</div>
+      <div class="q-text">Can you walk me through the order in which I brought up different interactions with the resort staff from October 13, 2024 to October 22, 2024, in order? Mention ONLY and ONLY ten items.</div>
+      <span class="q-badge badge-partial">◐ 0.1</span>
+    </div>
+    <div class="q-detail">Score: 0.1 | Match: 1/10 | Difficulty: medium | Source messages: None (abstention)</div>
+    <div class="q-rubric">
+      <div class="q-rubric-label">Expected Answer (Rubric)</div>
+      <div class="q-rubric-text">Kareem offers jet skiing package; Kareem checks in post-ride for feedback; Kareem proposes parasailing session; Kareem follows up post-flight; Nimal offers memory box; Nimal offers luggage scale rental; Nimal introduces farewell ceremony; Nimal collects feedback survey; Nimal confirms seaplane transfer briefing; Nimal sees us off with farewell chat</div>
+    </div>
+  </div>
+  <div class="q-item">
+    <div class="q-header">
+      <div class="q-num">Q184</div>
+      <div class="q-text">Can you walk me through the order in which I brought up different aspects of my beach wedding planning from July 1, 2023 to July 6, 2023, including venue options, guest capacities, permit fees, weather considerations, and accessibility concerns, in order? Mention ONLY and ONLY five items.</div>
+      <span class="q-badge badge-partial">◐ 0.2</span>
+    </div>
+    <div class="q-detail">Score: 0.2 | Match: 1/5 | Difficulty: medium | Source messages: None (abstention)</div>
+    <div class="q-rubric">
+      <div class="q-rubric-label">Expected Answer (Rubric)</div>
+      <div class="q-rubric-text">Weather and destination research; Venue options and guest capacities; Permit fees and application processes; Weather-related backup planning; Accessibility and guest logistics</div>
+    </div>
+  </div>
+  <div class="q-item">
+    <div class="q-header">
+      <div class="q-num">Q185</div>
+      <div class="q-text">Can you walk me through the order in which I brought up different aspects of event setup and guest management from July 16, 2023 to August 4, 2023, in order? Mention ONLY and ONLY ten items.</div>
+      <span class="q-badge badge-partial">◐ 0.1</span>
+    </div>
+    <div class="q-detail">Score: 0.1 | Match: 1/10 | Difficulty: medium | Source messages: None (abstention)</div>
+    <div class="q-rubric">
+      <div class="q-rubric-label">Expected Answer (Rubric)</div>
+      <div class="q-rubric-text">Lighting setup and power saving; Music timing delays and playlist cuts; Guest seating adjustments for complaints; Weather concerns and guest relocation; Video glitch troubleshooting and camera repositioning; Menu changes for dietary needs; Toast delays and speech trimming; Guest heat discomfort and cooling measures; Lighting ambiance softening; Adding fun dance activities</div>
+    </div>
+  </div>
+
+<h3 id="information_extraction" style="color:var(--gold-bright);margin-top:2rem;padding-top:1rem;border-top:1px solid rgba(201,162,75,0.15);">Information Extraction — 92.5% (18.5/20)</h3>
+  <div class="q-item">
+    <div class="q-header">
+      <div class="q-num">Q6</div>
+      <div class="q-text">What detection rate and total number of test records did I mention when setting up logs to catch that specific error?</div>
+      <span class="q-badge badge-pass">✓ 1.0</span>
+    </div>
+    <div class="q-detail">Score: 1.0 | Match: 1/1 | Difficulty: medium | Source messages: Yes</div>
+    <div class="q-rubric">
+      <div class="q-rubric-label">Expected Answer (Rubric)</div>
+      <div class="q-rubric-text">LLM response should state: 98% detection rate</div>
+    </div>
+  </div>
+  <div class="q-item">
+    <div class="q-header">
+      <div class="q-num">Q7</div>
+      <div class="q-text">What version of the vector database am I evaluating for indexing over 1 million documents?</div>
+      <span class="q-badge badge-pass">✓ 1.0</span>
+    </div>
+    <div class="q-detail">Score: 1.0 | Match: 1/1 | Difficulty: easy | Source messages: Yes</div>
+    <div class="q-rubric">
+      <div class="q-rubric-label">Expected Answer (Rubric)</div>
+      <div class="q-rubric-text">LLM response should state: Milvus 2.3.1</div>
+    </div>
+  </div>
+  <div class="q-item">
+    <div class="q-header">
+      <div class="q-num">Q26</div>
+      <div class="q-text">What delay did I find in the physics calculations per frame when I profiled the main loop?</div>
+      <span class="q-badge badge-pass">✓ 1.0</span>
+    </div>
+    <div class="q-detail">Score: 1.0 | Match: 1/1 | Difficulty: medium | Source messages: Yes</div>
+    <div class="q-rubric">
+      <div class="q-rubric-label">Expected Answer (Rubric)</div>
+      <div class="q-rubric-text">LLM response should state: 380ms delay</div>
+    </div>
+  </div>
+  <div class="q-item">
+    <div class="q-header">
+      <div class="q-num">Q27</div>
+      <div class="q-text">How many points did I simulate when mocking the sensor APIs with unittest.mock?</div>
+      <span class="q-badge badge-pass">✓ 1.0</span>
+    </div>
+    <div class="q-detail">Score: 1.0 | Match: 1/1 | Difficulty: easy | Source messages: Yes</div>
+    <div class="q-rubric">
+      <div class="q-rubric-label">Expected Answer (Rubric)</div>
+      <div class="q-rubric-text">LLM response should state: 5,000 points</div>
+    </div>
+  </div>
+  <div class="q-item">
+    <div class="q-header">
+      <div class="q-num">Q46</div>
+      <div class="q-text">What version of the platform did I say supports up to 2,000 agents with response times under 150ms?</div>
+      <span class="q-badge badge-pass">✓ 1.0</span>
+    </div>
+    <div class="q-detail">Score: 1.0 | Match: 1/1 | Difficulty: easy | Source messages: Yes</div>
+    <div class="q-rubric">
+      <div class="q-rubric-label">Expected Answer (Rubric)</div>
+      <div class="q-rubric-text">LLM response should state: Kubernetes 1.25</div>
+    </div>
+  </div>
+  <div class="q-item">
+    <div class="q-header">
+      <div class="q-num">Q47</div>
+      <div class="q-text">How many reward calculations per second did I say the module needs to handle?</div>
+      <span class="q-badge badge-pass">✓ 1.0</span>
+    </div>
+    <div class="q-detail">Score: 1.0 | Match: 1/1 | Difficulty: easy | Source messages: Yes</div>
+    <div class="q-rubric">
+      <div class="q-rubric-label">Expected Answer (Rubric)</div>
+      <div class="q-rubric-text">LLM response should state: 300 reward</div>
+    </div>
+  </div>
+  <div class="q-item">
+    <div class="q-header">
+      <div class="q-num">Q66</div>
+      <div class="q-text">How long did I say it would take me to confirm the discriminant for that PDE?</div>
+      <span class="q-badge badge-pass">✓ 1.0</span>
+    </div>
+    <div class="q-detail">Score: 1.0 | Match: 1/1 | Difficulty: easy | Source messages: Yes</div>
+    <div class="q-rubric">
+      <div class="q-rubric-label">Expected Answer (Rubric)</div>
+      <div class="q-rubric-text">LLM response should state: 15 minutes</div>
+    </div>
+  </div>
+  <div class="q-item">
+    <div class="q-header">
+      <div class="q-num">Q67</div>
+      <div class="q-text">How long did I say the video I watched on separation of variables was?</div>
+      <span class="q-badge badge-pass">✓ 1.0</span>
+    </div>
+    <div class="q-detail">Score: 1.0 | Match: 1/1 | Difficulty: easy | Source messages: Yes</div>
+    <div class="q-rubric">
+      <div class="q-rubric-label">Expected Answer (Rubric)</div>
+      <div class="q-rubric-text">LLM response should state: 30 minutes</div>
+    </div>
+  </div>
+  <div class="q-item">
+    <div class="q-header">
+      <div class="q-num">Q86</div>
+      <div class="q-text">Which version of the tokenization library am I using in my implementation?</div>
+      <span class="q-badge badge-pass">✓ 1.0</span>
+    </div>
+    <div class="q-detail">Score: 1.0 | Match: 1/1 | Difficulty: easy | Source messages: Yes</div>
+    <div class="q-rubric">
+      <div class="q-rubric-label">Expected Answer (Rubric)</div>
+      <div class="q-rubric-text">LLM response should state: 4.35.0</div>
+    </div>
+  </div>
+  <div class="q-item">
+    <div class="q-header">
+      <div class="q-num">Q87</div>
+      <div class="q-text">How long did I say I spent computing the norm using SageMath?</div>
+      <span class="q-badge badge-pass">✓ 1.0</span>
+    </div>
+    <div class="q-detail">Score: 1.0 | Match: 1/1 | Difficulty: easy | Source messages: Yes</div>
+    <div class="q-rubric">
+      <div class="q-rubric-label">Expected Answer (Rubric)</div>
+      <div class="q-rubric-text">LLM response should state: 15 minutes</div>
+    </div>
+  </div>
+  <div class="q-item">
+    <div class="q-header">
+      <div class="q-num">Q106</div>
+      <div class="q-text">How many business cards did I order from Vistaprint and what was the total cost?</div>
+      <span class="q-badge badge-partial">◐ 0.5</span>
+    </div>
+    <div class="q-detail">Score: 0.5 | Match: 1/2 | Difficulty: easy | Source messages: Yes</div>
+    <div class="q-rubric">
+      <div class="q-rubric-label">Expected Answer (Rubric)</div>
+      <div class="q-rubric-text">LLM response should state: 50 business; LLM response should state: $20</div>
+    </div>
+  </div>
+  <div class="q-item">
+    <div class="q-header">
+      <div class="q-num">Q107</div>
+      <div class="q-text">How much did I say I paid for the SD card I got from TechMart?</div>
+      <span class="q-badge badge-pass">✓ 1.0</span>
+    </div>
+    <div class="q-detail">Score: 1.0 | Match: 1/1 | Difficulty: easy | Source messages: Yes</div>
+    <div class="q-rubric">
+      <div class="q-rubric-label">Expected Answer (Rubric)</div>
+      <div class="q-rubric-text">LLM response should state: $10</div>
+    </div>
+  </div>
+  <div class="q-item">
+    <div class="q-header">
+      <div class="q-num">Q126</div>
+      <div class="q-text">What time did I say I searched for flights on Skyscanner?</div>
+      <span class="q-badge badge-pass">✓ 1.0</span>
+    </div>
+    <div class="q-detail">Score: 1.0 | Match: 1/1 | Difficulty: easy | Source messages: Yes</div>
+    <div class="q-rubric">
+      <div class="q-rubric-label">Expected Answer (Rubric)</div>
+      <div class="q-rubric-text">LLM response should state: 8 PM</div>
+    </div>
+  </div>
+  <div class="q-item">
+    <div class="q-header">
+      <div class="q-num">Q127</div>
+      <div class="q-text">How much did I say dinner cost at the place where Jenna seemed distant?</div>
+      <span class="q-badge badge-pass">✓ 1.0</span>
+    </div>
+    <div class="q-detail">Score: 1.0 | Match: 1/1 | Difficulty: medium | Source messages: Yes</div>
+    <div class="q-rubric">
+      <div class="q-rubric-label">Expected Answer (Rubric)</div>
+      <div class="q-rubric-text">LLM response should state: $40</div>
+    </div>
+  </div>
+  <div class="q-item">
+    <div class="q-header">
+      <div class="q-num">Q146</div>
+      <div class="q-text">When I called KOA Flagstaff to check on the tent space, how much area did they confirm was available for our setup?</div>
+      <span class="q-badge badge-pass">✓ 1.0</span>
+    </div>
+    <div class="q-detail">Score: 1.0 | Match: 1/1 | Difficulty: easy | Source messages: Yes</div>
+    <div class="q-rubric">
+      <div class="q-rubric-label">Expected Answer (Rubric)</div>
+      <div class="q-rubric-text">LLM response should state: 25 square feet</div>
+    </div>
+  </div>
+  <div class="q-item">
+    <div class="q-header">
+      <div class="q-num">Q147</div>
+      <div class="q-text">What wait time did I mention for the ride when using the app?</div>
+      <span class="q-badge badge-pass">✓ 1.0</span>
+    </div>
+    <div class="q-detail">Score: 1.0 | Match: 1/1 | Difficulty: easy | Source messages: Yes</div>
+    <div class="q-rubric">
+      <div class="q-rubric-label">Expected Answer (Rubric)</div>
+      <div class="q-rubric-text">LLM response should state: 25-minute</div>
+    </div>
+  </div>
+  <div class="q-item">
+    <div class="q-header">
+      <div class="q-num">Q166</div>
+      <div class="q-text">How many pages did I say the album I ordered has, and what was the cost?</div>
+      <span class="q-badge badge-partial">◐ 0.5</span>
+    </div>
+    <div class="q-detail">Score: 0.5 | Match: 1/2 | Difficulty: easy | Source messages: Yes</div>
+    <div class="q-rubric">
+      <div class="q-rubric-label">Expected Answer (Rubric)</div>
+      <div class="q-rubric-text">LLM response should state: 50 pages; LLM response should state: $75</div>
+    </div>
+  </div>
+  <div class="q-item">
+    <div class="q-header">
+      <div class="q-num">Q167</div>
+      <div class="q-text">How did I learn about the options to customize my water-based activities, and who would I coordinate with to explore extending or combining these experiences?</div>
+      <span class="q-badge badge-partial">◐ 0.5</span>
+    </div>
+    <div class="q-detail">Score: 0.5 | Match: 1/2 | Difficulty: hard | Source messages: Yes</div>
+    <div class="q-rubric">
+      <div class="q-rubric-label">Expected Answer (Rubric)</div>
+      <div class="q-rubric-text">LLM response should state: You learned about the possibility to extend or combine sessions, through discussions about the jet skiing package and follow-up inquiries about longer or combined experiences; LLM response should state: Kareem, the tour coordinator, is the person you would contact via the Soneva app, phone, or in person to arrange and customize these activities</div>
+    </div>
+  </div>
+  <div class="q-item">
+    <div class="q-header">
+      <div class="q-num">Q186</div>
+      <div class="q-text">How many chairs did I say I rented from Seaside Rentals?</div>
+      <span class="q-badge badge-pass">✓ 1.0</span>
+    </div>
+    <div class="q-detail">Score: 1.0 | Match: 1/1 | Difficulty: easy | Source messages: Yes</div>
+    <div class="q-rubric">
+      <div class="q-rubric-label">Expected Answer (Rubric)</div>
+      <div class="q-rubric-text">LLM response should state: 100 chairs</div>
+    </div>
+  </div>
+  <div class="q-item">
+    <div class="q-header">
+      <div class="q-num">Q187</div>
+      <div class="q-text">How much did I say it costs to rent each lantern?</div>
+      <span class="q-badge badge-pass">✓ 1.0</span>
+    </div>
+    <div class="q-detail">Score: 1.0 | Match: 1/1 | Difficulty: easy | Source messages: Yes</div>
+    <div class="q-rubric">
+      <div class="q-rubric-label">Expected Answer (Rubric)</div>
+      <div class="q-rubric-text">LLM response should state: $10</div>
+    </div>
+  </div>
+
+<h3 id="instruction_following" style="color:var(--gold-bright);margin-top:2rem;padding-top:1rem;border-top:1px solid rgba(201,162,75,0.15);">Instruction Following — 100.0% (20.0/20)</h3>
+  <div class="q-item">
+    <div class="q-header">
+      <div class="q-num">Q8</div>
+      <div class="q-text">What improvements can I make to speed up the process of handling queries?</div>
+      <span class="q-badge badge-pass">✓ 1.0</span>
+    </div>
+    <div class="q-detail">Score: 1.0 | Match: 2/2 | Difficulty: medium | Source messages: Yes</div>
+    <div class="q-rubric">
+      <div class="q-rubric-label">Expected Answer (Rubric)</div>
+      <div class="q-rubric-text">LLM response should contain: inclusion of latency numbers; LLM response should contain: mention of timing metrics</div>
+    </div>
+  </div>
+  <div class="q-item">
+    <div class="q-header">
+      <div class="q-num">Q9</div>
+      <div class="q-text">What targets should I consider when planning to handle increased load on my system?</div>
+      <span class="q-badge badge-pass">✓ 1.0</span>
+    </div>
+    <div class="q-detail">Score: 1.0 | Match: 1/1 | Difficulty: medium | Source messages: Yes</div>
+    <div class="q-rubric">
+      <div class="q-rubric-label">Expected Answer (Rubric)</div>
+      <div class="q-rubric-text">LLM response should contain: numerical latency goals</div>
+    </div>
+  </div>
+  <div class="q-item">
+    <div class="q-header">
+      <div class="q-num">Q28</div>
+      <div class="q-text">How is the system handling performance when rendering more complex scenes?</div>
+      <span class="q-badge badge-pass">✓ 1.0</span>
+    </div>
+    <div class="q-detail">Score: 1.0 | Match: 2/2 | Difficulty: medium | Source messages: Yes</div>
+    <div class="q-rubric">
+      <div class="q-rubric-label">Expected Answer (Rubric)</div>
+      <div class="q-rubric-text">LLM response should contain: mentions fps or frames per second; LLM response should contain: provides numerical frame rate values</div>
+    </div>
+  </div>
+  <div class="q-item">
+    <div class="q-header">
+      <div class="q-num">Q29</div>
+      <div class="q-text">How well does my algorithm perform?</div>
+      <span class="q-badge badge-pass">✓ 1.0</span>
+    </div>
+    <div class="q-detail">Score: 1.0 | Match: 2/2 | Difficulty: medium | Source messages: Yes</div>
+    <div class="q-rubric">
+      <div class="q-rubric-label">Expected Answer (Rubric)</div>
+      <div class="q-rubric-text">LLM response should contain: exact numerical success rate; LLM response should contain: specific percentage or ratio</div>
+    </div>
+  </div>
+  <div class="q-item">
+    <div class="q-header">
+      <div class="q-num">Q48</div>
+      <div class="q-text">What are some ways I can improve the speed of my database queries?</div>
+      <span class="q-badge badge-pass">✓ 1.0</span>
+    </div>
+    <div class="q-detail">Score: 1.0 | Match: 1/1 | Difficulty: medium | Source messages: Yes</div>
+    <div class="q-rubric">
+      <div class="q-rubric-label">Expected Answer (Rubric)</div>
+      <div class="q-rubric-text">LLM response should contain: mention of actual query durations</div>
+    </div>
+  </div>
+  <div class="q-item">
+    <div class="q-header">
+      <div class="q-num">Q49</div>
+      <div class="q-text">I'm trying to improve the design of my system. Can you help me identify areas where it might be optimized?</div>
+      <span class="q-badge badge-pass">✓ 1.0</span>
+    </div>
+    <div class="q-detail">Score: 1.0 | Match: 1/1 | Difficulty: medium | Source messages: Yes</div>
+    <div class="q-rubric">
+      <div class="q-rubric-label">Expected Answer (Rubric)</div>
+      <div class="q-rubric-text">LLM response should contain: naming modules explicitly</div>
+    </div>
+  </div>
+  <div class="q-item">
+    <div class="q-header">
+      <div class="q-num">Q68</div>
+      <div class="q-text">How do I use Green's functions to solve a PDE?</div>
+      <span class="q-badge badge-pass">✓ 1.0</span>
+    </div>
+    <div class="q-detail">Score: 1.0 | Match: 1/1 | Difficulty: medium | Source messages: Yes</div>
+    <div class="q-rubric">
+      <div class="q-rubric-label">Expected Answer (Rubric)</div>
+      <div class="q-rubric-text">LLM response should contain: worked numerical or symbolic examples</div>
+    </div>
+  </div>
+  <div class="q-item">
+    <div class="q-header">
+      <div class="q-num">Q69</div>
+      <div class="q-text">How do I use the 'plot' function in MATLAB?</div>
+      <span class="q-badge badge-pass">✓ 1.0</span>
+    </div>
+    <div class="q-detail">Score: 1.0 | Match: 2/2 | Difficulty: medium | Source messages: Yes</div>
+    <div class="q-rubric">
+      <div class="q-rubric-label">Expected Answer (Rubric)</div>
+      <div class="q-rubric-text">LLM response should contain: example MATLAB code; LLM response should contain: code snippet showing function usage</div>
+    </div>
+  </div>
+  <div class="q-item">
+    <div class="q-header">
+      <div class="q-num">Q88</div>
+      <div class="q-text">Can you help me prove that the sequence defined by x_n = 1/n approaches zero?</div>
+      <span class="q-badge badge-pass">✓ 1.0</span>
+    </div>
+    <div class="q-detail">Score: 1.0 | Match: 1/1 | Difficulty: medium | Source messages: Yes</div>
+    <div class="q-rubric">
+      <div class="q-rubric-label">Expected Answer (Rubric)</div>
+      <div class="q-rubric-text">LLM response should contain: step-by-step reasoning involving epsilon and delta</div>
+    </div>
+  </div>
+  <div class="q-item">
+    <div class="q-header">
+      <div class="q-num">Q89</div>
+      <div class="q-text">How does the Fredholm alternative help determine the solvability of linear equations?</div>
+      <span class="q-badge badge-pass">✓ 1.0</span>
+    </div>
+    <div class="q-detail">Score: 1.0 | Match: 1/1 | Difficulty: medium | Source messages: Yes</div>
+    <div class="q-rubric">
+      <div class="q-rubric-label">Expected Answer (Rubric)</div>
+      <div class="q-rubric-text">LLM response should contain: geometric intuition of solution spaces</div>
+    </div>
+  </div>
+  <div class="q-item">
+    <div class="q-header">
+      <div class="q-num">Q108</div>
+      <div class="q-text">How can I get started with keeping a journal?</div>
+      <span class="q-badge badge-pass">✓ 1.0</span>
+    </div>
+    <div class="q-detail">Score: 1.0 | Match: 2/2 | Difficulty: medium | Source messages: Yes</div>
+    <div class="q-rubric">
+      <div class="q-rubric-label">Expected Answer (Rubric)</div>
+      <div class="q-rubric-text">LLM response should contain: mentions of feelings or moods; LLM response should contain: emotional context in journaling</div>
+    </div>
+  </div>
+  <div class="q-item">
+    <div class="q-header">
+      <div class="q-num">Q109</div>
+      <div class="q-text">What options do you recommend for accessories to go with my instrument?</div>
+      <span class="q-badge badge-pass">✓ 1.0</span>
+    </div>
+    <div class="q-detail">Score: 1.0 | Match: 2/2 | Difficulty: medium | Source messages: Yes</div>
+    <div class="q-rubric">
+      <div class="q-rubric-label">Expected Answer (Rubric)</div>
+      <div class="q-rubric-text">LLM response should contain: brand names mentioned; LLM response should contain: price details provided</div>
+    </div>
+  </div>
+  <div class="q-item">
+    <div class="q-header">
+      <div class="q-num">Q128</div>
+      <div class="q-text">What are some good options I can use to improve my health?</div>
+      <span class="q-badge badge-pass">✓ 1.0</span>
+    </div>
+    <div class="q-detail">Score: 1.0 | Match: 2/2 | Difficulty: medium | Source messages: Yes</div>
+    <div class="q-rubric">
+      <div class="q-rubric-label">Expected Answer (Rubric)</div>
+      <div class="q-rubric-text">LLM response should contain: listing app names; LLM response should contain: providing cost information</div>
+    </div>
+  </div>
+  <div class="q-item">
+    <div class="q-header">
+      <div class="q-num">Q129</div>
+      <div class="q-text">What are some healthy options I can consider for my meals?</div>
+      <span class="q-badge badge-pass">✓ 1.0</span>
+    </div>
+    <div class="q-detail">Score: 1.0 | Match: 2/2 | Difficulty: medium | Source messages: Yes</div>
+    <div class="q-rubric">
+      <div class="q-rubric-label">Expected Answer (Rubric)</div>
+      <div class="q-rubric-text">LLM response should contain: itemized list of costs; LLM response should contain: category-by-category breakdown</div>
+    </div>
+  </div>
+  <div class="q-item">
+    <div class="q-header">
+      <div class="q-num">Q148</div>
+      <div class="q-text">Can you update me on the current status of my budget?</div>
+      <span class="q-badge badge-pass">✓ 1.0</span>
+    </div>
+    <div class="q-detail">Score: 1.0 | Match: 2/2 | Difficulty: medium | Source messages: Yes</div>
+    <div class="q-rubric">
+      <div class="q-rubric-label">Expected Answer (Rubric)</div>
+      <div class="q-rubric-text">LLM response should contain: mention of fuel costs; LLM response should contain: fuel expenses detailed alongside budget</div>
+    </div>
+  </div>
+  <div class="q-item">
+    <div class="q-header">
+      <div class="q-num">Q149</div>
+      <div class="q-text">When can I expect someone to come out for help with my vehicle?</div>
+      <span class="q-badge badge-pass">✓ 1.0</span>
+    </div>
+    <div class="q-detail">Score: 1.0 | Match: 1/1 | Difficulty: medium | Source messages: Yes</div>
+    <div class="q-rubric">
+      <div class="q-rubric-label">Expected Answer (Rubric)</div>
+      <div class="q-rubric-text">LLM response should contain: specific time or time window for the service call</div>
+    </div>
+  </div>
+  <div class="q-item">
+    <div class="q-header">
+      <div class="q-num">Q168</div>
+      <div class="q-text">What should I consider when choosing between different snacks?</div>
+      <span class="q-badge badge-pass">✓ 1.0</span>
+    </div>
+    <div class="q-detail">Score: 1.0 | Match: 2/2 | Difficulty: medium | Source messages: Yes</div>
+    <div class="q-rubric">
+      <div class="q-rubric-label">Expected Answer (Rubric)</div>
+      <div class="q-rubric-text">LLM response should contain: mention of portion amounts; LLM response should contain: reference to quantity per item</div>
+    </div>
+  </div>
+  <div class="q-item">
+    <div class="q-header">
+      <div class="q-num">Q169</div>
+      <div class="q-text">What should I bring for the trip?</div>
+      <span class="q-badge badge-pass">✓ 1.0</span>
+    </div>
+    <div class="q-detail">Score: 1.0 | Match: 2/2 | Difficulty: medium | Source messages: Yes</div>
+    <div class="q-rubric">
+      <div class="q-rubric-label">Expected Answer (Rubric)</div>
+      <div class="q-rubric-text">LLM response should contain: mentions exact counts of items; LLM response should contain: provides numeric details for each item</div>
+    </div>
+  </div>
+  <div class="q-item">
+    <div class="q-header">
+      <div class="q-num">Q188</div>
+      <div class="q-text">What are the costs involved in the decorations for the event?</div>
+      <span class="q-badge badge-pass">✓ 1.0</span>
+    </div>
+    <div class="q-detail">Score: 1.0 | Match: 2/2 | Difficulty: medium | Source messages: Yes</div>
+    <div class="q-rubric">
+      <div class="q-rubric-label">Expected Answer (Rubric)</div>
+      <div class="q-rubric-text">LLM response should contain: mention of floral budget; LLM response should contain: details about flower-related costs</div>
+    </div>
+  </div>
+  <div class="q-item">
+    <div class="q-header">
+      <div class="q-num">Q189</div>
+      <div class="q-text">What services are available for visitors during their stay?</div>
+      <span class="q-badge badge-pass">✓ 1.0</span>
+    </div>
+    <div class="q-detail">Score: 1.0 | Match: 2/2 | Difficulty: medium | Source messages: Yes</div>
+    <div class="q-rubric">
+      <div class="q-rubric-label">Expected Answer (Rubric)</div>
+      <div class="q-rubric-text">LLM response should contain: clear mention of available support services; LLM response should contain: detailed description of visitor help offerings</div>
+    </div>
+  </div>
+
+<h3 id="knowledge_update" style="color:var(--gold-bright);margin-top:2rem;padding-top:1rem;border-top:1px solid rgba(201,162,75,0.15);">Knowledge Update — 97.5% (19.5/20)</h3>
+  <div class="q-item">
+    <div class="q-header">
+      <div class="q-num">Q10</div>
+      <div class="q-text">How many tasks have I logged in Jira for the sprint on 2024-11-05, and what is my sprint completion target percentage?</div>
+      <span class="q-badge badge-pass">✓ 1.0</span>
+    </div>
+    <div class="q-detail">Score: 1.0 | Match: 2/2 | Difficulty: moderate | Source messages: Yes</div>
+    <div class="q-rubric">
+      <div class="q-rubric-label">Expected Answer (Rubric)</div>
+      <div class="q-rubric-text">LLM response should state: 17 tasks; LLM response should state: 88%</div>
+    </div>
+  </div>
+  <div class="q-item">
+    <div class="q-header">
+      <div class="q-num">Q11</div>
+      <div class="q-text">How many tasks are logged in Jira for load balancing, and what is the sprint completion target percentage?</div>
+      <span class="q-badge badge-partial">◐ 0.5</span>
+    </div>
+    <div class="q-detail">Score: 0.5 | Match: 1/2 | Difficulty: moderate | Source messages: Yes</div>
+    <div class="q-rubric">
+      <div class="q-rubric-label">Expected Answer (Rubric)</div>
+      <div class="q-rubric-text">LLM response should state: 14 tasks; LLM response should state: 85%</div>
+    </div>
+  </div>
+  <div class="q-item">
+    <div class="q-header">
+      <div class="q-num">Q30</div>
+      <div class="q-text">What event processing capacity does my log tool support per minute without downtime?</div>
+      <span class="q-badge badge-pass">✓ 1.0</span>
+    </div>
+    <div class="q-detail">Score: 1.0 | Match: 1/1 | Difficulty: easy | Source messages: Yes</div>
+    <div class="q-rubric">
+      <div class="q-rubric-label">Expected Answer (Rubric)</div>
+      <div class="q-rubric-text">LLM response should state: 1,200 events per minute</div>
+    </div>
+  </div>
+  <div class="q-item">
+    <div class="q-header">
+      <div class="q-num">Q31</div>
+      <div class="q-text">What percentage of the reward function engineering has been completed, and when is the safety metrics integration expected to be finished?</div>
+      <span class="q-badge badge-pass">✓ 1.0</span>
+    </div>
+    <div class="q-detail">Score: 1.0 | Match: 1/1 | Difficulty: moderate | Source messages: Yes</div>
+    <div class="q-rubric">
+      <div class="q-rubric-label">Expected Answer (Rubric)</div>
+      <div class="q-rubric-text">LLM response should state: 20% complete</div>
+    </div>
+  </div>
+  <div class="q-item">
+    <div class="q-header">
+      <div class="q-num">Q50</div>
+      <div class="q-text">How many agents does my protocol logic cover, and what reliability level does it achieve?</div>
+      <span class="q-badge badge-pass">✓ 1.0</span>
+    </div>
+    <div class="q-detail">Score: 1.0 | Match: 2/2 | Difficulty: moderate | Source messages: Yes</div>
+    <div class="q-rubric">
+      <div class="q-rubric-label">Expected Answer (Rubric)</div>
+      <div class="q-rubric-text">LLM response should state: 25 agents; LLM response should state: 93%</div>
+    </div>
+  </div>
+  <div class="q-item">
+    <div class="q-header">
+      <div class="q-num">Q51</div>
+      <div class="q-text">How many agents have I covered with integration tests, and what impact has this had on pass rates and team agreement?</div>
+      <span class="q-badge badge-pass">✓ 1.0</span>
+    </div>
+    <div class="q-detail">Score: 1.0 | Match: 2/2 | Difficulty: moderate | Source messages: Yes</div>
+    <div class="q-rubric">
+      <div class="q-rubric-label">Expected Answer (Rubric)</div>
+      <div class="q-rubric-text">LLM response should state: 15 agents; LLM response should state: improved pass rates and increased team consensus on validation outcomes</div>
+    </div>
+  </div>
+  <div class="q-item">
+    <div class="q-header">
+      <div class="q-num">Q70</div>
+      <div class="q-text">How many problems from Section 14.3 on gradients have I solved correctly, and how much time did I spend on them?</div>
+      <span class="q-badge badge-pass">✓ 1.0</span>
+    </div>
+    <div class="q-detail">Score: 1.0 | Match: 2/2 | Difficulty: easy | Source messages: Yes</div>
+    <div class="q-rubric">
+      <div class="q-rubric-label">Expected Answer (Rubric)</div>
+      <div class="q-rubric-text">LLM response should state: 9 problems; LLM response should state: 50 minutes</div>
+    </div>
+  </div>
+  <div class="q-item">
+    <div class="q-header">
+      <div class="q-num">Q71</div>
+      <div class="q-text">What score did I achieve on my ODE quiz after practicing 25 problems?</div>
+      <span class="q-badge badge-pass">✓ 1.0</span>
+    </div>
+    <div class="q-detail">Score: 1.0 | Match: 1/1 | Difficulty: easy | Source messages: Yes</div>
+    <div class="q-rubric">
+      <div class="q-rubric-label">Expected Answer (Rubric)</div>
+      <div class="q-rubric-text">LLM response should state: 88%</div>
+    </div>
+  </div>
+  <div class="q-item">
+    <div class="q-header">
+      <div class="q-num">Q90</div>
+      <div class="q-text">How many questions did I answer correctly on my initial quiz about linear operator definitions?</div>
+      <span class="q-badge badge-pass">✓ 1.0</span>
+    </div>
+    <div class="q-detail">Score: 1.0 | Match: 1/1 | Difficulty: easy | Source messages: Yes</div>
+    <div class="q-rubric">
+      <div class="q-rubric-label">Expected Answer (Rubric)</div>
+      <div class="q-rubric-text">LLM response should state: 14 questions</div>
+    </div>
+  </div>
+  <div class="q-item">
+    <div class="q-header">
+      <div class="q-num">Q91</div>
+      <div class="q-text">What score did I achieve on my quiz about the parallelogram law following my additional study time?</div>
+      <span class="q-badge badge-pass">✓ 1.0</span>
+    </div>
+    <div class="q-detail">Score: 1.0 | Match: 1/1 | Difficulty: easy | Source messages: Yes</div>
+    <div class="q-rubric">
+      <div class="q-rubric-label">Expected Answer (Rubric)</div>
+      <div class="q-rubric-text">LLM response should state: 79%</div>
+    </div>
+  </div>
+  <div class="q-item">
+    <div class="q-header">
+      <div class="q-num">Q110</div>
+      <div class="q-text">How much time do I dedicate to my morning rhythm variation drills?</div>
+      <span class="q-badge badge-pass">✓ 1.0</span>
+    </div>
+    <div class="q-detail">Score: 1.0 | Match: 1/1 | Difficulty: easy | Source messages: Yes</div>
+    <div class="q-rubric">
+      <div class="q-rubric-label">Expected Answer (Rubric)</div>
+      <div class="q-rubric-text">LLM response should state: 30 minutes</div>
+    </div>
+  </div>
+  <div class="q-item">
+    <div class="q-header">
+      <div class="q-num">Q111</div>
+      <div class="q-text">How long is my open mic performance slot at Coral Bay Club?</div>
+      <span class="q-badge badge-pass">✓ 1.0</span>
+    </div>
+    <div class="q-detail">Score: 1.0 | Match: 1/1 | Difficulty: easy | Source messages: Yes</div>
+    <div class="q-rubric">
+      <div class="q-rubric-label">Expected Answer (Rubric)</div>
+      <div class="q-rubric-text">LLM response should state: 7 minutes</div>
+    </div>
+  </div>
+  <div class="q-item">
+    <div class="q-header">
+      <div class="q-num">Q130</div>
+      <div class="q-text">What time do I set aside for my Saturday budget review sessions?</div>
+      <span class="q-badge badge-pass">✓ 1.0</span>
+    </div>
+    <div class="q-detail">Score: 1.0 | Match: 1/1 | Difficulty: easy | Source messages: Yes</div>
+    <div class="q-rubric">
+      <div class="q-rubric-label">Expected Answer (Rubric)</div>
+      <div class="q-rubric-text">LLM response should state: 5 PM</div>
+    </div>
+  </div>
+  <div class="q-item">
+    <div class="q-header">
+      <div class="q-num">Q131</div>
+      <div class="q-text">When is the desk assembly scheduled to take place?</div>
+      <span class="q-badge badge-pass">✓ 1.0</span>
+    </div>
+    <div class="q-detail">Score: 1.0 | Match: 1/1 | Difficulty: easy | Source messages: Yes</div>
+    <div class="q-rubric">
+      <div class="q-rubric-label">Expected Answer (Rubric)</div>
+      <div class="q-rubric-text">LLM response should state: November 7</div>
+    </div>
+  </div>
+  <div class="q-item">
+    <div class="q-header">
+      <div class="q-num">Q150</div>
+      <div class="q-text">What is the total amount I should expect to pay on my final bill at the Holiday Inn, including any minibar charges?</div>
+      <span class="q-badge badge-pass">✓ 1.0</span>
+    </div>
+    <div class="q-detail">Score: 1.0 | Match: 1/1 | Difficulty: easy | Source messages: Yes</div>
+    <div class="q-rubric">
+      <div class="q-rubric-label">Expected Answer (Rubric)</div>
+      <div class="q-rubric-text">LLM response should state: $130</div>
+    </div>
+  </div>
+  <div class="q-item">
+    <div class="q-header">
+      <div class="q-num">Q151</div>
+      <div class="q-text">How many photos have I tagged for my blog header?</div>
+      <span class="q-badge badge-pass">✓ 1.0</span>
+    </div>
+    <div class="q-detail">Score: 1.0 | Match: 1/1 | Difficulty: easy | Source messages: Yes</div>
+    <div class="q-rubric">
+      <div class="q-rubric-label">Expected Answer (Rubric)</div>
+      <div class="q-rubric-text">LLM response should state: 15 photos</div>
+    </div>
+  </div>
+  <div class="q-item">
+    <div class="q-header">
+      <div class="q-num">Q170</div>
+      <div class="q-text">How long is the family vision meeting scheduled to last, and what is the budget for refreshments?</div>
+      <span class="q-badge badge-pass">✓ 1.0</span>
+    </div>
+    <div class="q-detail">Score: 1.0 | Match: 2/2 | Difficulty: moderate | Source messages: Yes</div>
+    <div class="q-rubric">
+      <div class="q-rubric-label">Expected Answer (Rubric)</div>
+      <div class="q-rubric-text">LLM response should state: 90 minutes; LLM response should state: $75</div>
+    </div>
+  </div>
+  <div class="q-item">
+    <div class="q-header">
+      <div class="q-num">Q171</div>
+      <div class="q-text">How much does the seaplane ride to Velaa Private Island cost per person?</div>
+      <span class="q-badge badge-pass">✓ 1.0</span>
+    </div>
+    <div class="q-detail">Score: 1.0 | Match: 1/1 | Difficulty: easy | Source messages: Yes</div>
+    <div class="q-rubric">
+      <div class="q-rubric-label">Expected Answer (Rubric)</div>
+      <div class="q-rubric-text">LLM response should state: $650</div>
+    </div>
+  </div>
+  <div class="q-item">
+    <div class="q-header">
+      <div class="q-num">Q190</div>
+      <div class="q-text">How much do the 100 napkins cost with the discount I secured?</div>
+      <span class="q-badge badge-pass">✓ 1.0</span>
+    </div>
+    <div class="q-detail">Score: 1.0 | Match: 1/1 | Difficulty: easy | Source messages: Yes</div>
+    <div class="q-rubric">
+      <div class="q-rubric-label">Expected Answer (Rubric)</div>
+      <div class="q-rubric-text">LLM response should state: $120</div>
+    </div>
+  </div>
+  <div class="q-item">
+    <div class="q-header">
+      <div class="q-num">Q191</div>
+      <div class="q-text">How many members are on my team handling lighting fixes and guest concerns?</div>
+      <span class="q-badge badge-pass">✓ 1.0</span>
+    </div>
+    <div class="q-detail">Score: 1.0 | Match: 1/1 | Difficulty: easy | Source messages: Yes</div>
+    <div class="q-rubric">
+      <div class="q-rubric-label">Expected Answer (Rubric)</div>
+      <div class="q-rubric-text">LLM response should state: 8 members</div>
+    </div>
+  </div>
+
+<h3 id="multi_session_reasoning" style="color:var(--gold-bright);margin-top:2rem;padding-top:1rem;border-top:1px solid rgba(201,162,75,0.15);">Multi-Session Reasoning — 92.8% (18.6/20)</h3>
+  <div class="q-item">
+    <div class="q-header">
+      <div class="q-num">Q12</div>
+      <div class="q-text">How many documents am I planning to handle in total when combining my Elasticsearch and Solr projects?</div>
+      <span class="q-badge badge-pass">✓ 1.0</span>
+    </div>
+    <div class="q-detail">Score: 1.0 | Match: 1/1 | Difficulty: easy | Source messages: Yes</div>
+    <div class="q-rubric">
+      <div class="q-rubric-label">Expected Answer (Rubric)</div>
+      <div class="q-rubric-text">LLM response should state: costs 1.8 million</div>
+    </div>
+  </div>
+  <div class="q-item">
+    <div class="q-header">
+      <div class="q-num">Q13</div>
+      <div class="q-text">How many queries per second am I aiming to support across sharding, load balancing, and partitioning efforts combined?</div>
+      <span class="q-badge badge-pass">✓ 1.0</span>
+    </div>
+    <div class="q-detail">Score: 1.0 | Match: 1/1 | Difficulty: easy | Source messages: Yes</div>
+    <div class="q-rubric">
+      <div class="q-rubric-label">Expected Answer (Rubric)</div>
+      <div class="q-rubric-text">LLM response should state: 5,000</div>
+    </div>
+  </div>
+  <div class="q-item">
+    <div class="q-header">
+      <div class="q-num">Q32</div>
+      <div class="q-text">How much total delay have I noted across the agent updates, pedestrian updates, and camera data sync issues?</div>
+      <span class="q-badge badge-pass">✓ 1.0</span>
+    </div>
+    <div class="q-detail">Score: 1.0 | Match: 4/4 | Difficulty: easy | Source messages: Yes</div>
+    <div class="q-rubric">
+      <div class="q-rubric-label">Expected Answer (Rubric)</div>
+      <div class="q-rubric-text">LLM response should state: total delay is 750ms; LLM response should state: 300ms from agent updates; LLM response should state: 250ms from pedestrian updates; LLM response should state: 200ms from camera data sync</div>
+    </div>
+  </div>
+  <div class="q-item">
+    <div class="q-header">
+      <div class="q-num">Q33</div>
+      <div class="q-text">How many different error types related to sensor data debugging did I mention across my sessions?</div>
+      <span class="q-badge badge-pass">✓ 1.0</span>
+    </div>
+    <div class="q-detail">Score: 1.0 | Match: 1/1 | Difficulty: easy | Source messages: Yes</div>
+    <div class="q-rubric">
+      <div class="q-rubric-label">Expected Answer (Rubric)</div>
+      <div class="q-rubric-text">LLM response should state: Seven</div>
+    </div>
+  </div>
+  <div class="q-item">
+    <div class="q-header">
+      <div class="q-num">Q52</div>
+      <div class="q-text">How many agents in total did I mention while debugging issues related to timeouts, format mismatches, and state overload?</div>
+      <span class="q-badge badge-pass">✓ 1.0</span>
+    </div>
+    <div class="q-detail">Score: 1.0 | Match: 1/1 | Difficulty: easy | Source messages: Yes</div>
+    <div class="q-rubric">
+      <div class="q-rubric-label">Expected Answer (Rubric)</div>
+      <div class="q-rubric-text">LLM response should state: 130 agents</div>
+    </div>
+  </div>
+  <div class="q-item">
+    <div class="q-header">
+      <div class="q-num">Q53</div>
+      <div class="q-text">How many agents have I completed work on when combining my progress on reward functions, Q-learning, and policy gradients?</div>
+      <span class="q-badge badge-pass">✓ 1.0</span>
+    </div>
+    <div class="q-detail">Score: 1.0 | Match: 1/1 | Difficulty: easy | Source messages: Yes</div>
+    <div class="q-rubric">
+      <div class="q-rubric-label">Expected Answer (Rubric)</div>
+      <div class="q-rubric-text">LLM response should state: 55 agents</div>
+    </div>
+  </div>
+  <div class="q-item">
+    <div class="q-header">
+      <div class="q-num">Q72</div>
+      <div class="q-text">How many total problems did I practice across calculus, integration, and ODE sets based on my progress updates?</div>
+      <span class="q-badge badge-pass">✓ 1.0</span>
+    </div>
+    <div class="q-detail">Score: 1.0 | Match: 1/1 | Difficulty: easy | Source messages: Yes</div>
+    <div class="q-rubric">
+      <div class="q-rubric-label">Expected Answer (Rubric)</div>
+      <div class="q-rubric-text">LLM response should state: 85 problems</div>
+    </div>
+  </div>
+  <div class="q-item">
+    <div class="q-header">
+      <div class="q-num">Q73</div>
+      <div class="q-text">How many times did I work with Rebecca on solving heat or wave equations involving sine initial conditions across my sessions?</div>
+      <span class="q-badge badge-pass">✓ 1.0</span>
+    </div>
+    <div class="q-detail">Score: 1.0 | Match: 1/1 | Difficulty: easy | Source messages: Yes</div>
+    <div class="q-rubric">
+      <div class="q-rubric-label">Expected Answer (Rubric)</div>
+      <div class="q-rubric-text">LLM response should state: 3 times</div>
+    </div>
+  </div>
+  <div class="q-item">
+    <div class="q-header">
+      <div class="q-num">Q92</div>
+      <div class="q-text">How many total minutes did Devin and I spend discussing vector addition from 2024-07-01 till 2024-07-31</div>
+      <span class="q-badge badge-pass">✓ 1.0</span>
+    </div>
+    <div class="q-detail">Score: 1.0 | Match: 1/1 | Difficulty: easy | Source messages: Yes</div>
+    <div class="q-rubric">
+      <div class="q-rubric-label">Expected Answer (Rubric)</div>
+      <div class="q-rubric-text">LLM response should state: 350 minutes</div>
+    </div>
+  </div>
+  <div class="q-item">
+    <div class="q-header">
+      <div class="q-num">Q93</div>
+      <div class="q-text">Across my quizzes on vector spaces, norm properties, and completeness, how many questions did I miss in total on topics related to axioms, metric axioms, and Hilbert criteria?</div>
+      <span class="q-badge badge-pass">✓ 1.0</span>
+    </div>
+    <div class="q-detail">Score: 1.0 | Match: 1/1 | Difficulty: easy | Source messages: Yes</div>
+    <div class="q-rubric">
+      <div class="q-rubric-label">Expected Answer (Rubric)</div>
+      <div class="q-rubric-text">LLM response should state: 14 questions</div>
+    </div>
+  </div>
+  <div class="q-item">
+    <div class="q-header">
+      <div class="q-num">Q112</div>
+      <div class="q-text">How many $30 sessions with John have I mentioned attending or planning to attend so far?</div>
+      <span class="q-badge badge-pass">✓ 1.0</span>
+    </div>
+    <div class="q-detail">Score: 1.0 | Match: 1/1 | Difficulty: easy | Source messages: Yes</div>
+    <div class="q-rubric">
+      <div class="q-rubric-label">Expected Answer (Rubric)</div>
+      <div class="q-rubric-text">LLM response should state: 10 sessions</div>
+    </div>
+  </div>
+  <div class="q-item">
+    <div class="q-header">
+      <div class="q-num">Q113</div>
+      <div class="q-text">How have my incremental changes to morning and evening practice durations combined with my goals for rhythm and performance accuracy influenced my overall practice efficiency and progress towards mastering complex songs?</div>
+      <span class="q-badge badge-partial">◐ 0.4</span>
+    </div>
+    <div class="q-detail">Score: 0.4 | Match: 2/5 | Difficulty: hard | Source messages: Yes</div>
+    <div class="q-rubric">
+      <div class="q-rubric-label">Expected Answer (Rubric)</div>
+      <div class="q-rubric-text">LLM response should state: Your incremental morning practice extensions from 50 to 70 minutes, combined with added focused evening slots; LLM response should state: rhythm improvement targets (15-20%); LLM response should state: aiming for 90% accuracy on 5 complex songs; LLM response should state: your progress has synergistically increased your practice efficiency by enabling focused, balanced skill development; LLM response should state: This structured layering of time and goals has optimized your progress, allowing steady technical mastery while managing performance readiness and anxiety</div>
+    </div>
+  </div>
+  <div class="q-item">
+    <div class="q-header">
+      <div class="q-num">Q132</div>
+      <div class="q-text">How much of my $50 date budget have I spent on the movie and picnic combined, and how much do I have left?</div>
+      <span class="q-badge badge-pass">✓ 1.0</span>
+    </div>
+    <div class="q-detail">Score: 1.0 | Match: 2/2 | Difficulty: easy | Source messages: Yes</div>
+    <div class="q-rubric">
+      <div class="q-rubric-label">Expected Answer (Rubric)</div>
+      <div class="q-rubric-text">LLM response should state: spent $30 in total; LLM response should state: $20 remaining</div>
+    </div>
+  </div>
+  <div class="q-item">
+    <div class="q-header">
+      <div class="q-num">Q133</div>
+      <div class="q-text">How many ideas have I shared at the philosophy club across meetings from May 1, 2022 to August 27, 2022?</div>
+      <span class="q-badge badge-pass">✓ 1.0</span>
+    </div>
+    <div class="q-detail">Score: 1.0 | Match: 1/1 | Difficulty: easy | Source messages: Yes</div>
+    <div class="q-rubric">
+      <div class="q-rubric-label">Expected Answer (Rubric)</div>
+      <div class="q-rubric-text">LLM response should state: 14 ideas</div>
+    </div>
+  </div>
+  <div class="q-item">
+    <div class="q-header">
+      <div class="q-num">Q152</div>
+      <div class="q-text">How many hours in total did I spend at the Grand Canyon during my trip, combining all my stops and hikes?</div>
+      <span class="q-badge badge-pass">✓ 1.0</span>
+    </div>
+    <div class="q-detail">Score: 1.0 | Match: 1/1 | Difficulty: easy | Source messages: Yes</div>
+    <div class="q-rubric">
+      <div class="q-rubric-label">Expected Answer (Rubric)</div>
+      <div class="q-rubric-text">LLM response should state: 11 hours</div>
+    </div>
+  </div>
+  <div class="q-item">
+    <div class="q-header">
+      <div class="q-num">Q153</div>
+      <div class="q-text">How much have I allocated in total for event-related expenses across my budgets for flyers, venue fees, and snacks?</div>
+      <span class="q-badge badge-pass">✓ 1.0</span>
+    </div>
+    <div class="q-detail">Score: 1.0 | Match: 4/4 | Difficulty: easy | Source messages: Yes</div>
+    <div class="q-rubric">
+      <div class="q-rubric-label">Expected Answer (Rubric)</div>
+      <div class="q-rubric-text">LLM response should state: $100 for event flyers; LLM response should state: $20 for venue fees; LLM response should state: $10 for snacks; LLM response should state: $130 in total</div>
+    </div>
+  </div>
+  <div class="q-item">
+    <div class="q-header">
+      <div class="q-num">Q172</div>
+      <div class="q-text">Given my finalized budget and allocations, how much can I realistically spend on spa sessions at Dusit Thani without exceeding my total budget, considering my accommodation, transfers, insurance, and extras?</div>
+      <span class="q-badge badge-pass">✓ 1.0</span>
+    </div>
+    <div class="q-detail">Score: 1.0 | Match: 3/3 | Difficulty: hard | Source messages: Yes</div>
+    <div class="q-rubric">
+      <div class="q-rubric-label">Expected Answer (Rubric)</div>
+      <div class="q-rubric-text">LLM response should state: You can afford one spa session at Dusit Thani costing $400; LLM response should state: allocating $500 for the all-inclusive package; LLM response should state: $900 for other activities and dining</div>
+    </div>
+  </div>
+  <div class="q-item">
+    <div class="q-header">
+      <div class="q-num">Q173</div>
+      <div class="q-text">How much total time am I planning to spend on the first and second islands combined during my tour?</div>
+      <span class="q-badge badge-pass">✓ 1.0</span>
+    </div>
+    <div class="q-detail">Score: 1.0 | Match: 1/1 | Difficulty: easy | Source messages: Yes</div>
+    <div class="q-rubric">
+      <div class="q-rubric-label">Expected Answer (Rubric)</div>
+      <div class="q-rubric-text">LLM response should state: 3.5 hours</div>
+    </div>
+  </div>
+  <div class="q-item">
+    <div class="q-header">
+      <div class="q-num">Q192</div>
+      <div class="q-text">How much will I spend in total if I rent 10 wooden arches from Beachside Rentals and 10 from Ocean Breeze Rentals at their quoted prices?</div>
+      <span class="q-badge badge-partial">◐ 0.67</span>
+    </div>
+    <div class="q-detail">Score: 0.67 | Match: 2/3 | Difficulty: easy | Source messages: Yes</div>
+    <div class="q-rubric">
+      <div class="q-rubric-label">Expected Answer (Rubric)</div>
+      <div class="q-rubric-text">LLM response should state: $1,000 in total; LLM response should state: $500 for 10 arches from Beachside Rentals; LLM response should state: $500 for 10 arches from Ocean Breeze Rentals</div>
+    </div>
+  </div>
+  <div class="q-item">
+    <div class="q-header">
+      <div class="q-num">Q193</div>
+      <div class="q-text">How much did I spend in total on catering, and what percentage of guests rated the local cuisine highly across all sessions?</div>
+      <span class="q-badge badge-partial">◐ 0.5</span>
+    </div>
+    <div class="q-detail">Score: 0.5 | Match: 1/2 | Difficulty: easy | Source messages: Yes</div>
+    <div class="q-rubric">
+      <div class="q-rubric-label">Expected Answer (Rubric)</div>
+      <div class="q-rubric-text">LLM response should state: $10,000 on catering; LLM response should state: between 85% and 90% of guests rating the local cuisine highly</div>
+    </div>
+  </div>
+
+<h3 id="preference_following" style="color:var(--gold-bright);margin-top:2rem;padding-top:1rem;border-top:1px solid rgba(201,162,75,0.15);">Preference Following — 100.0% (20.0/20)</h3>
+  <div class="q-item">
+    <div class="q-header">
+      <div class="q-num">Q14</div>
+      <div class="q-text">I'm planning to estimate costs for running multiple cloud instances. How would you suggest structuring the calculation to handle different providers and instance counts?</div>
+      <span class="q-badge badge-pass">✓ 1.0</span>
+    </div>
+    <div class="q-detail">Score: 1.0 | Match: 2/2 | Difficulty: medium | Source messages: Yes</div>
+    <div class="q-rubric">
+      <div class="q-rubric-label">Expected Answer (Rubric)</div>
+      <div class="q-rubric-text">LLM response should contain: uses or references AWS EC2 cost of $0.11/hour; LLM response should contain: includes calculation for 500 instances</div>
+    </div>
+  </div>
+  <div class="q-item">
+    <div class="q-header">
+      <div class="q-num">Q15</div>
+      <div class="q-text">I'm setting up a system to handle a large number of vector searches. How would you suggest structuring the indexing and search process to keep things running smoothly?</div>
+      <span class="q-badge badge-pass">✓ 1.0</span>
+    </div>
+    <div class="q-detail">Score: 1.0 | Match: 2/2 | Difficulty: medium | Source messages: Yes</div>
+    <div class="q-rubric">
+      <div class="q-rubric-label">Expected Answer (Rubric)</div>
+      <div class="q-rubric-text">LLM response should contain: mentions Milvus 2.3.0 or compatible versions; LLM response should contain: addresses indexing strategies for millions of vectors</div>
+    </div>
+  </div>
+  <div class="q-item">
+    <div class="q-header">
+      <div class="q-num">Q34</div>
+      <div class="q-text">I'm trying to improve the structure of my code to make it run more smoothly. What changes would you suggest to the way my modules interact?</div>
+      <span class="q-badge badge-pass">✓ 1.0</span>
+    </div>
+    <div class="q-detail">Score: 1.0 | Match: 1/1 | Difficulty: medium | Source messages: Yes</div>
+    <div class="q-rubric">
+      <div class="q-rubric-label">Expected Answer (Rubric)</div>
+      <div class="q-rubric-text">LLM response should contain: recommends reducing calls between modules</div>
+    </div>
+  </div>
+  <div class="q-item">
+    <div class="q-header">
+      <div class="q-num">Q35</div>
+      <div class="q-text">I'm working on improving my traffic simulation code. How would you suggest I incorporate variability in vehicle speeds?</div>
+      <span class="q-badge badge-pass">✓ 1.0</span>
+    </div>
+    <div class="q-detail">Score: 1.0 | Match: 1/1 | Difficulty: medium | Source messages: Yes</div>
+    <div class="q-rubric">
+      <div class="q-rubric-label">Expected Answer (Rubric)</div>
+      <div class="q-rubric-text">LLM response should contain: mentions or suggests a speed variance close to 15%</div>
+    </div>
+  </div>
+  <div class="q-item">
+    <div class="q-header">
+      <div class="q-num">Q54</div>
+      <div class="q-text">I'm setting up authentication for a platform with a high number of users logging in simultaneously. What would you suggest I consider when choosing an authentication service?</div>
+      <span class="q-badge badge-pass">✓ 1.0</span>
+    </div>
+    <div class="q-detail">Score: 1.0 | Match: 2/2 | Difficulty: medium | Source messages: Yes</div>
+    <div class="q-rubric">
+      <div class="q-rubric-label">Expected Answer (Rubric)</div>
+      <div class="q-rubric-text">LLM response should contain: mentions token validation speed; LLM response should contain: discusses handling large numbers of simultaneous logins</div>
+    </div>
+  </div>
+  <div class="q-item">
+    <div class="q-header">
+      <div class="q-num">Q55</div>
+      <div class="q-text">Can you help me set up a logging pipeline that can reliably handle over a thousand events per minute and integrate smoothly with a Python web framework?</div>
+      <span class="q-badge badge-pass">✓ 1.0</span>
+    </div>
+    <div class="q-detail">Score: 1.0 | Match: 1/1 | Difficulty: medium | Source messages: Yes</div>
+    <div class="q-rubric">
+      <div class="q-rubric-label">Expected Answer (Rubric)</div>
+      <div class="q-rubric-text">LLM response should contain: mentions ELK Stack or Elasticsearch-based solutions</div>
+    </div>
+  </div>
+  <div class="q-item">
+    <div class="q-header">
+      <div class="q-num">Q74</div>
+      <div class="q-text">I'm planning how to organize my study sessions for the next few chapters. How would you suggest structuring my note-taking and review periods to make the most of my time?</div>
+      <span class="q-badge badge-pass">✓ 1.0</span>
+    </div>
+    <div class="q-detail">Score: 1.0 | Match: 1/1 | Difficulty: medium | Source messages: Yes</div>
+    <div class="q-rubric">
+      <div class="q-rubric-label">Expected Answer (Rubric)</div>
+      <div class="q-rubric-text">LLM response should contain: suggests digital note-taking or a mix that accounts for speed</div>
+    </div>
+  </div>
+  <div class="q-item">
+    <div class="q-header">
+      <div class="q-num">Q75</div>
+      <div class="q-text">When preparing for upcoming exams, what strategies would you recommend to balance reading new material and revisiting summaries of previous chapters so that I can optimize my study flow?</div>
+      <span class="q-badge badge-pass">✓ 1.0</span>
+    </div>
+    <div class="q-detail">Score: 1.0 | Match: 1/1 | Difficulty: medium | Source messages: Yes</div>
+    <div class="q-rubric">
+      <div class="q-rubric-label">Expected Answer (Rubric)</div>
+      <div class="q-rubric-text">LLM response should contain: suggests digital note-taking or a mix that accounts for speed</div>
+    </div>
+  </div>
+  <div class="q-item">
+    <div class="q-header">
+      <div class="q-num">Q94</div>
+      <div class="q-text">I’m planning to enroll in an online course to improve my problem-solving skills. Which platform would you recommend I go with?</div>
+      <span class="q-badge badge-pass">✓ 1.0</span>
+    </div>
+    <div class="q-detail">Score: 1.0 | Match: 1/1 | Difficulty: medium | Source messages: Yes</div>
+    <div class="q-rubric">
+      <div class="q-rubric-label">Expected Answer (Rubric)</div>
+      <div class="q-rubric-text">LLM response should contain: Suggest Udemy</div>
+    </div>
+  </div>
+  <div class="q-item">
+    <div class="q-header">
+      <div class="q-num">Q95</div>
+      <div class="q-text">I want to pick an online course that gives me plenty of practice problems to work through. Which platform would you recommend I go with?</div>
+      <span class="q-badge badge-pass">✓ 1.0</span>
+    </div>
+    <div class="q-detail">Score: 1.0 | Match: 1/1 | Difficulty: medium | Source messages: Yes</div>
+    <div class="q-rubric">
+      <div class="q-rubric-label">Expected Answer (Rubric)</div>
+      <div class="q-rubric-text">LLM response should contain: Suggest Udemy</div>
+    </div>
+  </div>
+  <div class="q-item">
+    <div class="q-header">
+      <div class="q-num">Q114</div>
+      <div class="q-text">What should I keep in mind when choosing a ukulele for different playing styles?</div>
+      <span class="q-badge badge-pass">✓ 1.0</span>
+    </div>
+    <div class="q-detail">Score: 1.0 | Match: 2/2 | Difficulty: medium | Source messages: Yes</div>
+    <div class="q-rubric">
+      <div class="q-rubric-label">Expected Answer (Rubric)</div>
+      <div class="q-rubric-text">LLM response should contain: mentions the Kala ukulele as the current instrument; LLM response should contain: avoids suggesting the Mahalo model or similar lower-tier options</div>
+    </div>
+  </div>
+  <div class="q-item">
+    <div class="q-header">
+      <div class="q-num">Q115</div>
+      <div class="q-text">I'm planning how to allocate my budget for improving my skills and gear. How would you suggest I divide my spending?</div>
+      <span class="q-badge badge-pass">✓ 1.0</span>
+    </div>
+    <div class="q-detail">Score: 1.0 | Match: 2/2 | Difficulty: medium | Source messages: Yes</div>
+    <div class="q-rubric">
+      <div class="q-rubric-label">Expected Answer (Rubric)</div>
+      <div class="q-rubric-text">LLM response should contain: recommends investing more in lessons or practice; LLM response should contain: suggests limiting spending on accessories</div>
+    </div>
+  </div>
+  <div class="q-item">
+    <div class="q-header">
+      <div class="q-num">Q134</div>
+      <div class="q-text">What should I keep in mind when planning my workout schedule around different times of the day near Palm Street?</div>
+      <span class="q-badge badge-pass">✓ 1.0</span>
+    </div>
+    <div class="q-detail">Score: 1.0 | Match: 2/2 | Difficulty: medium | Source messages: Yes</div>
+    <div class="q-rubric">
+      <div class="q-rubric-label">Expected Answer (Rubric)</div>
+      <div class="q-rubric-text">LLM response should contain: mentions quieter conditions in the morning; LLM response should contain: avoids recommending evening workouts</div>
+    </div>
+  </div>
+  <div class="q-item">
+    <div class="q-header">
+      <div class="q-num">Q135</div>
+      <div class="q-text">I'm planning to update the lighting in my living room. What kind of bulbs would you suggest I use?</div>
+      <span class="q-badge badge-pass">✓ 1.0</span>
+    </div>
+    <div class="q-detail">Score: 1.0 | Match: 2/2 | Difficulty: medium | Source messages: Yes</div>
+    <div class="q-rubric">
+      <div class="q-rubric-label">Expected Answer (Rubric)</div>
+      <div class="q-rubric-text">LLM response should contain: mentions warm or soft lighting options; LLM response should contain: avoids recommending harsh fluorescent bulbs</div>
+    </div>
+  </div>
+  <div class="q-item">
+    <div class="q-header">
+      <div class="q-num">Q154</div>
+      <div class="q-text">I'm planning the route for our upcoming trip. How would you suggest I map it out?</div>
+      <span class="q-badge badge-pass">✓ 1.0</span>
+    </div>
+    <div class="q-detail">Score: 1.0 | Match: 3/3 | Difficulty: medium | Source messages: Yes</div>
+    <div class="q-rubric">
+      <div class="q-rubric-label">Expected Answer (Rubric)</div>
+      <div class="q-rubric-text">LLM response should contain: recommends routes without tolls; LLM response should contain: offers detours that bypass toll roads; LLM response should contain: acknowledges avoiding toll fees in route planning</div>
+    </div>
+  </div>
+  <div class="q-item">
+    <div class="q-header">
+      <div class="q-num">Q155</div>
+      <div class="q-text">I'm trying to decide which vehicle to focus on for my daily commute. What should I keep in mind when comparing different models?</div>
+      <span class="q-badge badge-pass">✓ 1.0</span>
+    </div>
+    <div class="q-detail">Score: 1.0 | Match: 2/2 | Difficulty: medium | Source messages: Yes</div>
+    <div class="q-rubric">
+      <div class="q-rubric-label">Expected Answer (Rubric)</div>
+      <div class="q-rubric-text">LLM response should contain: discusses comfort features or ride quality; LLM response should contain: compares models with attention to comfort features or ride quality factors</div>
+    </div>
+  </div>
+  <div class="q-item">
+    <div class="q-header">
+      <div class="q-num">Q174</div>
+      <div class="q-text">I'm planning some water activities and want to make the most of the time on the lagoon. What would you suggest I focus on during the experience?</div>
+      <span class="q-badge badge-pass">✓ 1.0</span>
+    </div>
+    <div class="q-detail">Score: 1.0 | Match: 2/2 | Difficulty: medium | Source messages: Yes</div>
+    <div class="q-rubric">
+      <div class="q-rubric-label">Expected Answer (Rubric)</div>
+      <div class="q-rubric-text">LLM response should contain: focuses on jet skiing details; LLM response should contain: avoids suggesting parasailing or other water activities not aligned with jet skiing</div>
+    </div>
+  </div>
+  <div class="q-item">
+    <div class="q-header">
+      <div class="q-num">Q175</div>
+      <div class="q-text">I'm planning a dinner by the water and trying to decide between different types of settings. What are some options I should consider?</div>
+      <span class="q-badge badge-pass">✓ 1.0</span>
+    </div>
+    <div class="q-detail">Score: 1.0 | Match: 2/2 | Difficulty: medium | Source messages: Yes</div>
+    <div class="q-rubric">
+      <div class="q-rubric-label">Expected Answer (Rubric)</div>
+      <div class="q-rubric-text">LLM response should contain: mentions secluded shoreline settings; LLM response should contain: includes beach dining options</div>
+    </div>
+  </div>
+  <div class="q-item">
+    <div class="q-header">
+      <div class="q-num">Q194</div>
+      <div class="q-text">How should I allocate my budget between flowers and lighting to create a cohesive look for the event?</div>
+      <span class="q-badge badge-pass">✓ 1.0</span>
+    </div>
+    <div class="q-detail">Score: 1.0 | Match: 3/3 | Difficulty: medium | Source messages: Yes</div>
+    <div class="q-rubric">
+      <div class="q-rubric-label">Expected Answer (Rubric)</div>
+      <div class="q-rubric-text">LLM response should contain: allocates approximately twice as much budget to flowers as to lighting; LLM response should contain: emphasizes flower arrangements in the plan; LLM response should contain: suggests lighting options within the smaller budget portion</div>
+    </div>
+  </div>
+  <div class="q-item">
+    <div class="q-header">
+      <div class="q-num">Q195</div>
+      <div class="q-text">How should I organize the travel bookings for my group at Sandy Shore Bistro to get started?</div>
+      <span class="q-badge badge-pass">✓ 1.0</span>
+    </div>
+    <div class="q-detail">Score: 1.0 | Match: 2/2 | Difficulty: medium | Source messages: Yes</div>
+    <div class="q-rubric">
+      <div class="q-rubric-label">Expected Answer (Rubric)</div>
+      <div class="q-rubric-text">LLM response should contain: recommends starting with the 20 key relatives; LLM response should contain: acknowledges a phased or prioritized booking approach</div>
+    </div>
+  </div>
+
+<h3 id="summarization" style="color:var(--gold-bright);margin-top:2rem;padding-top:1rem;border-top:1px solid rgba(201,162,75,0.15);">Summarization — 53.2% (10.6/20)</h3>
+  <div class="q-item">
+    <div class="q-header">
+      <div class="q-num">Q16</div>
+      <div class="q-text">Can you summarize my overall progress and key developments in improving my vector search and logging capabilities 2024-08-01 to 2024-10-22?</div>
+      <span class="q-badge badge-pass">✓ 1.0</span>
+    </div>
+    <div class="q-detail">Score: 1.0 | Match: 6/6 | Difficulty: medium | Source messages: Yes</div>
+    <div class="q-rubric">
+      <div class="q-rubric-label">Expected Answer (Rubric)</div>
+      <div class="q-rubric-text">LLM response should contain: you explored various vector indexing strategies; LLM response should contain: weighing various vector indexing strategies trade-offs in terms of accuracy, speed, and scalability; LLM response should contain: integrated vector search techniques with log aggregation tools, focusing on efficient querying and real-time data handling; LLM response should contain: you designed a high-availability architecture combining Elasticsearch and Faiss to meet demanding query volumes and uptime requirements; LLM response should contain: you refined your API design to support vector search operations effectively; LLM response should contain: you incorporated monitoring and alerting mechanisms to ensure system reliability and performance, demonstrating a comprehensive development from foundational concepts to practical solutions</div>
+    </div>
+  </div>
+  <div class="q-item">
+    <div class="q-header">
+      <div class="q-num">Q17</div>
+      <div class="q-text">Can you summarize how my system architecture and performance optimization plans evolved from 2024-07-01 to 2024-07-29?</div>
+      <span class="q-badge badge-pass">✓ 1.0</span>
+    </div>
+    <div class="q-detail">Score: 1.0 | Match: 5/5 | Difficulty: medium | Source messages: Yes</div>
+    <div class="q-rubric">
+      <div class="q-rubric-label">Expected Answer (Rubric)</div>
+      <div class="q-rubric-text">LLM response should contain: you focused on designing a modular system capable of handling high daily query volumes with strict response time and uptime requirements; LLM response should contain: you explored advanced load balancing algorithms and health check implementations to ensure high availability and efficient traffic distribution; LLM response should contain: incorporated distributed caching solutions like Redis Cluster to enhance scalability and fault tolerance; LLM response should contain: you integrated microservices architecture with container orchestration and message queues to improve modularity and inter-service communication; LLM response should contain: you refined deployment strategies, CI/CD pipeline configurations, and monitoring setups to maintain high deployment success rates and system reliability</div>
+    </div>
+  </div>
+  <div class="q-item">
+    <div class="q-header">
+      <div class="q-num">Q36</div>
+      <div class="q-text">Can you summarize the overall progress and key developments in my traffic simulation project, including how I addressed performance issues, optimized agent behaviors, and integrated real-time data from 2024-08-01 to 2024-10-13?</div>
+      <span class="q-badge badge-pass">✓ 1.0</span>
+    </div>
+    <div class="q-detail">Score: 1.0 | Match: 5/5 | Difficulty: medium | Source messages: Yes</div>
+    <div class="q-rubric">
+      <div class="q-rubric-label">Expected Answer (Rubric)</div>
+      <div class="q-rubric-text">LLM response should contain: you focused on managing agent density and spawn rates; LLM response should contain: implemented grid-based spatial partitioning to reduce agent overlaps and improve performance; LLM response should contain: you incorporated advanced collision detection techniques, including quad trees and PhysX integration; LLM response should contain: integrated real-time data streams and adaptive traffic signal timing using Unreal Engine's timer system and ROS 2; LLM response should contain: you optimized UI responsiveness and logging strategies to maintain high update rates and minimize overhead</div>
+    </div>
+  </div>
+  <div class="q-item">
+    <div class="q-header">
+      <div class="q-num">Q37</div>
+      <div class="q-text">Can you give me a summary of how the performance optimization efforts for my self-driving car simulation progressed from 2025-01-16 to 2025-01-31?</div>
+      <span class="q-badge badge-partial">◐ 0.8</span>
+    </div>
+    <div class="q-detail">Score: 0.8 | Match: 4/5 | Difficulty: medium | Source messages: Yes</div>
+    <div class="q-rubric">
+      <div class="q-rubric-label">Expected Answer (Rubric)</div>
+      <div class="q-rubric-text">LLM response should contain: investigations traced memory spikes to unoptimized Lidar data structures and physics calculations that overloaded single threads; LLM response should contain: implemented data structure improvements, including k-d trees for efficient Lidar point management, and introduced parallel processing techniques using joblib and CUDA streams to offload compute-heavy tasks to the GPU; LLM response should contain: rendering optimizations were pursued by adopting deferred shading and frustum culling to reduce overdraw and unnecessary draw calls; LLM response should contain: profiling tools like Intel VTune and Nsight Compute guided your efforts, revealing delays caused by thread lock contention and synchronization issues; LLM response should contain: The optimization journey was iterative, involving continuous profiling, code refactoring, and leveraging advanced rendering and parallelization techniques to steadily reduce runtime and improve scalability</div>
+    </div>
+  </div>
+  <div class="q-item">
+    <div class="q-header">
+      <div class="q-num">Q56</div>
+      <div class="q-text">Can you summarize the overall progress and key developments in setting up and optimizing the backend infrastructure for our multi-agent AI platform from 2024-08-01 to 2024-09-19?</div>
+      <span class="q-badge badge-partial">◐ 0.6</span>
+    </div>
+    <div class="q-detail">Score: 0.6 | Match: 3/5 | Difficulty: medium | Source messages: Yes</div>
+    <div class="q-rubric">
+      <div class="q-rubric-label">Expected Answer (Rubric)</div>
+      <div class="q-rubric-text">LLM response should contain: backend infrastructure setup for the multi-agent AI platform began with selecting FastAPI 0.78 and Python 3.9; LLM response should contain: Early challenges included addressing latency spikes caused by improper server configurations in Flask, leading to a transition towards FastAPI with asynchronous capabilities; LLM response should contain: The team progressively implemented features such as JWT-based authentication, load balancing with NGINX, and robust error handling including circuit breakers; LLM response should contain: Parallel efforts involved optimizing MQTT-based agent communication, scaling message throughput to hundreds of messages per second with low latency, and integrating TLS 1.3 for secure message passing; LLM response should contain: Throughout the development, sprint planning, team collaboration, and monitoring strategies were established to track progress, manage risks, and maintain 99.8% uptime targets</div>
+    </div>
+  </div>
+  <div class="q-item">
+    <div class="q-header">
+      <div class="q-num">Q57</div>
+      <div class="q-text">Can you summarize how I identified and resolved the technical challenges in my multi-agent AI platform from 2025-01-01 to 2025-01-30?</div>
+      <span class="q-badge badge-partial">◐ 0.6</span>
+    </div>
+    <div class="q-detail">Score: 0.6 | Match: 3/5 | Difficulty: medium | Source messages: Yes</div>
+    <div class="q-rubric">
+      <div class="q-rubric-label">Expected Answer (Rubric)</div>
+      <div class="q-rubric-text">LLM response should contain: you initially encountered high CPU usage during simulations involving multiple agents, which you began addressing by profiling your PyTorch code and optimizing batch processing; LLM response should contain: you identified specific bottlenecks such as unoptimized matrix operations and thread contention due to oversubscribed CPU cores; LLM response should contain: recurring spikes and errors linked to logging and profiling under heavy load, prompting the integration of a ResourceMonitor module to efficiently track CPU metrics and manage data collection bugs; LLM response should contain: tackled issues related to outdated dependencies and test baselines, improving error diagnosis and regression test reliability; LLM response should contain: you refined your debugging and error handling approaches, incorporating detailed logging and systematic profiling to enhance the platform's stability and performance</div>
+    </div>
+  </div>
+  <div class="q-item">
+    <div class="q-header">
+      <div class="q-num">Q76</div>
+      <div class="q-text">Can you summarize my learning journey and progress with Green's functions, including how my understanding and study habits evolved from 2025-03-01 to 2025-03-31?</div>
+      <span class="q-badge badge-fail">✗ 0.0</span>
+    </div>
+    <div class="q-detail">Score: 0.0 | Match: 0/4 | Difficulty: medium | Source messages: None (abstention)</div>
+    <div class="q-rubric">
+      <div class="q-rubric-label">Expected Answer (Rubric)</div>
+      <div class="q-rubric-text">LLM response should contain: you focused on understanding continuity and jump conditions at the source point, ensuring the Green's function satisfies boundary conditions; LLM response should contain: you applied these concepts to solve boundary value problems, gradually tackling more complex PDEs such as the heat and wave equations; LLM response should contain: Your study habits evolved to include daily dedicated hours, reviewing one or two properties per session, utilizing visualization tools like MATLAB and Desmos; LLM response should contain: you practiced formulating well-posed problems, verifying existence, uniqueness, and stability, and integrating numerical methods for evaluating integrals</div>
+    </div>
+  </div>
+  <div class="q-item">
+    <div class="q-header">
+      <div class="q-num">Q77</div>
+      <div class="q-text">Can you summarize my learning journey and progress with understanding the physical interpretations and solution methods of PDEs, including how I tackled different types, identified limitations of separation of variables, and approached non-separable cases from 2024-08-01 to 2024-10-22?</div>
+      <span class="q-badge badge-fail">✗ 0.0</span>
+    </div>
+    <div class="q-detail">Score: 0.0 | Match: 0/6 | Difficulty: medium | Source messages: None (abstention)</div>
+    <div class="q-rubric">
+      <div class="q-rubric-label">Expected Answer (Rubric)</div>
+      <div class="q-rubric-text">LLM response should contain: exploring the physical interpretations of various types, such as elliptic PDEs modeling steady-state phenomena like temperature distribution; LLM response should contain: exploring parabolic PDEs representing diffusion processes like heat flow, and hyperbolic PDEs describing wave propagation; LLM response should contain: deepened your understanding by practicing separation of variables on classic equations like the heat and wave equations, recognizing the importance of boundary and initial conditions in shaping solutions; LLM response should contain: As you encountered PDEs with non-homogeneous or nonlinear terms, you identified the limitations of separation of variables; LLM response should contain: you learned to find particular solutions to handle non-homogeneous terms and transform PDEs into homogeneous forms amenable to separation of variables; LLM response should contain: you applied these concepts to a variety of PDEs, marking non-separable cases clearly and using eigenfunction expansions, numerical methods, or transformations</div>
+    </div>
+  </div>
+  <div class="q-item">
+    <div class="q-header">
+      <div class="q-num">Q96</div>
+      <div class="q-text">Can you summarize my learning journey and progress with the concept of completeness in normed and Banach spaces, including how I worked through understanding Cauchy sequences, convergence, and examples of completeness and incompleteness across different spaces?</div>
+      <span class="q-badge badge-fail">✗ 0.0</span>
+    </div>
+    <div class="q-detail">Score: 0.0 | Match: 0/5 | Difficulty: medium | Source messages: None (abstention)</div>
+    <div class="q-rubric">
+      <div class="q-rubric-label">Expected Answer (Rubric)</div>
+      <div class="q-rubric-text">LLM response should contain: you focused on grasping the definitions of Cauchy sequences and convergence; LLM response should contain: explored the completeness property, learning that Banach spaces are normed spaces where every Cauchy sequence converges within the space; LLM response should contain: you studied examples of incompleteness, such as sequences in the rationals that fail to converge within the space; LLM response should contain: practiced proving sets are closed by showing they contain all their limit points; LLM response should contain: you reinforced your understanding by examining norm equivalence and how it preserves topological properties like convergence and completeness</div>
+    </div>
+  </div>
+  <div class="q-item">
+    <div class="q-header">
+      <div class="q-num">Q97</div>
+      <div class="q-text">Can you summarize my learning journey and progress with operator theory, including how my understanding of boundedness, spectrum, and resolvent sets developed over time?</div>
+      <span class="q-badge badge-partial">◐ 0.8</span>
+    </div>
+    <div class="q-detail">Score: 0.8 | Match: 4/5 | Difficulty: medium | Source messages: Yes</div>
+    <div class="q-rubric">
+      <div class="q-rubric-label">Expected Answer (Rubric)</div>
+      <div class="q-rubric-text">LLM response should contain: you explored definitions and applied them to simple operators; LLM response should contain: you deepened your understanding by verifying linearity properties and boundedness criteria through step-by-step problem solving and practical examples; LLM response should contain: progressed to spectral theory, learning to identify the spectrum and resolvent set of operators and extending to matrix operators; LLM response should contain: you engaged with computational tools like MATLAB and SageMath to verify eigenvalues and invertibility, which reinforced your theoretical knowledge; LLM response should contain: Your grasp of these concepts evolved through iterative practice, error analysis, and reflection, culminating in a more confident application of spectral theory to both finite and infinite-dimensional operators</div>
+    </div>
+  </div>
+  <div class="q-item">
+    <div class="q-header">
+      <div class="q-num">Q116</div>
+      <div class="q-text">Can you summarize how my collaborations and interactions with my peers and mentors have developed from November 1, 2021 to December 27, 2021 and influenced my musical growth?</div>
+      <span class="q-badge badge-partial">◐ 0.33</span>
+    </div>
+    <div class="q-detail">Score: 0.33 | Match: 2/6 | Difficulty: medium | Source messages: Yes</div>
+    <div class="q-rubric">
+      <div class="q-rubric-label">Expected Answer (Rubric)</div>
+      <div class="q-rubric-text">LLM response should contain: your mentor John at Harmony Hub provided targeted advice on learning challenging pieces; LLM response should contain: John critiqued your performances with actionable feedback; LLM response should contain: John encouraged improvisation, fostering your technical and emotional growth; LLM response should contain: peer collaborations with Nicole, Keith, and Shannon introduced diverse perspectives and practical support, from tempo adjustments and co-teaching sessions to joint performances and brand promotion efforts; LLM response should contain: Family support also played a role, with Barbara and Brian contributing to practice planning and emotional encouragement; LLM response should contain: interactions have collectively enhanced your skills, confidence, and professional outlook, demonstrating a progression from individual learning to integrated community engagement</div>
+    </div>
+  </div>
+  <div class="q-item">
+    <div class="q-header">
+      <div class="q-num">Q117</div>
+      <div class="q-text">Can you provide a detailed summary of my overall progress and experiences with my ukulele practice and mentorship, capturing how various sessions, feedback, and resources have influenced my development and preparation from September 1, 2021 to October 28, 2021?</div>
+      <span class="q-badge badge-partial">◐ 0.67</span>
+    </div>
+    <div class="q-detail">Score: 0.67 | Match: 6/9 | Difficulty: hard | Source messages: Yes</div>
+    <div class="q-rubric">
+      <div class="q-rubric-label">Expected Answer (Rubric)</div>
+      <div class="q-rubric-text">LLM response should contain: John emphasized focused practice on a select set of songs, helping you polish key pieces for performances and addressing specific technical challenges; LLM response should contain: introduced structured tools such as a monthly practice planner to enhance organization and consistency; LLM response should contain: John’s feedback highlighted measurable improvements, including significant boosts in finger agility, dynamics, timing, and overall technique; LLM response should contain: John’s advice extended beyond technique to include stage presence coaching, anxiety management strategies, and recording setup tips, fostering a holistic development approach; LLM response should contain: Parallel to John’s mentorship, you balanced family support and peer feedback, integrating diverse perspectives to refine your skills and maintain motivation; LLM response should contain: Performance opportunities, such as gigs and open mic nights facilitated through Harmony Hub, provided practical platforms to apply your learning and build confidence; LLM response should contain: Regular reviews and reflection guides from John encouraged structured self-assessment, enhancing your focus and enabling you to set clear, actionable goals; LLM response should contain: Managing challenges like pre-gig tension and shaky hands was addressed through both mental and physical preparation techniques, supported by mentor insights; LLM response should contain: Your journey reflects a dynamic interplay of expert guidance, personal discipline, and community engagement</div>
+    </div>
+  </div>
+  <div class="q-item">
+    <div class="q-header">
+      <div class="q-num">Q136</div>
+      <div class="q-text">Can you summarize how I've been managing my work-life balance and personal time from March 5, 2020 to March 30, 2021?</div>
+      <span class="q-badge badge-partial">◐ 0.75</span>
+    </div>
+    <div class="q-detail">Score: 0.75 | Match: 3/4 | Difficulty: medium | Source messages: Yes</div>
+    <div class="q-rubric">
+      <div class="q-rubric-label">Expected Answer (Rubric)</div>
+      <div class="q-rubric-text">LLM response should contain: you focused on reducing work stress by using tools like the Calm app and implementing strategies such as setting boundaries and prioritizing tasks; LLM response should contain: incorporated regular personal and social activities, including art nights, workouts, trivia, hiking, and quality time with Jenna and family; LLM response should contain: you emphasized planning and scheduling personal time as non-negotiable, using time-blocking and effective task management to protect this time; LLM response should contain: You also developed strategies to maintain this balance long-term, such as delegating tasks, reflecting regularly, and communicating openly with loved ones</div>
+    </div>
+  </div>
+  <div class="q-item">
+    <div class="q-header">
+      <div class="q-num">Q137</div>
+      <div class="q-text">Can you summarize how Jenna and I have developed our fitness and financial routines together from May 3, 2021 to September 7, 2021?</div>
+      <span class="q-badge badge-pass">✓ 1.0</span>
+    </div>
+    <div class="q-detail">Score: 1.0 | Match: 5/5 | Difficulty: medium | Source messages: Yes</div>
+    <div class="q-rubric">
+      <div class="q-rubric-label">Expected Answer (Rubric)</div>
+      <div class="q-rubric-text">LLM response should contain: you discussed workout ideas and established a regular schedule that included varied activities like jogging, hiking, yoga, and strength training; LLM response should contain: Jenna's encouragement and participation helped maintain motivation, and you both planned hikes and runs at local spots such as Reef Trail and Coral Beach, gradually increasing distance and intensity; LLM response should contain: you began with budget discussions over coffee, setting spending limits and celebrating savings milestones with budget-friendly outings like picnics; LLM response should contain: You established regular financial check-ins, shared budgeting responsibilities, and set joint goals including building an emergency fund and planning for retirement; LLM response should contain: you maintained open communication, involved Jenna in decision-making, and balanced celebrating progress with maintaining discipline</div>
+    </div>
+  </div>
+  <div class="q-item">
+    <div class="q-header">
+      <div class="q-num">Q156</div>
+      <div class="q-text">Can you give me a summary of how Chris and I planned and managed our accommodations, travel logistics, and daily routines throughout our road trip preparations from January 2, 2023 to March 10, 2023?</div>
+      <span class="q-badge badge-partial">◐ 0.83</span>
+    </div>
+    <div class="q-detail">Score: 0.83 | Match: 5/6 | Difficulty: medium | Source messages: Yes</div>
+    <div class="q-rubric">
+      <div class="q-rubric-label">Expected Answer (Rubric)</div>
+      <div class="q-rubric-text">LLM response should contain: Chris suggested starting accommodation bookings at Denny's on Coral Street and aimed for about 10 stops along your 2,400-mile route; LLM response should contain: Chris esearched and confirmed campgrounds, such as the KOA near St. Louis and Flagstaff, carefully considering costs and amenities to fit your budget; LLM response should contain: Chris also managed vehicle rental details, including confirming the Hertz Corolla hybrid reservation and insurance costs; LLM response should contain: Chris proposed daily 5-minute check-in calls and flagged important alerts like a storm in Oklahoma, suggesting a 1-day delay to ensure safety; LLM response should contain: Chris recommended practical packing choices, such as bringing two REI sleeping bags for campground nights, and curated entertainment options like Spotify playlists to enhance the trip experience; LLM response should contain: you balanced driving shifts, rest, and sightseeing stops, integrating landmarks like Cadillac Ranch and Lake Erie into your itinerary</div>
+    </div>
+  </div>
+  <div class="q-item">
+    <div class="q-header">
+      <div class="q-num">Q157</div>
+      <div class="q-text">Can you summarize how my travel decisions and habits evolved from April 8, 2023 to April 25, 2023 and how they influenced my overall experience and personal growth?</div>
+      <span class="q-badge badge-partial">◐ 0.17</span>
+    </div>
+    <div class="q-detail">Score: 0.17 | Match: 1/6 | Difficulty: medium | Source messages: Yes</div>
+    <div class="q-rubric">
+      <div class="q-rubric-label">Expected Answer (Rubric)</div>
+      <div class="q-rubric-text">LLM response should contain: you faced challenges with long driving stretches, leading to fatigue and physical discomfort, which prompted you to shift towards shorter, 3-hour max drives; LLM response should contain: shift towards shorter, 3-hour max drives reduced your fatigue by about 20%, improved your physical comfort, and allowed for more flexibility and spontaneous exploration; LLM response should contain: you reevaluated your travel style by limiting the number of stops, moving from 10-stop marathons to 2-stop max trips, which decreased your stress by 35% and enhanced your patience; LLM response should contain: These adjustments helped you handle unexpected detours and fees more calmly, contributing to your emotional resilience; LLM response should contain: you prioritized experiences over material possessions, focusing on deeper engagement with fewer locations, which enriched your cultural immersion; LLM response should contain: Habit changes such as increasing nightly sleep to 8-9 hours and boosting hydration by 25% further supported your well-being during travel and daily life</div>
+    </div>
+  </div>
+  <div class="q-item">
+    <div class="q-header">
+      <div class="q-num">Q176</div>
+      <div class="q-text">Can you summarize how my spouse and I have developed and maintained our connection and shared experiences from October 23, 2024 to November 29, 2024?</div>
+      <span class="q-badge badge-partial">◐ 0.4</span>
+    </div>
+    <div class="q-detail">Score: 0.4 | Match: 2/5 | Difficulty: medium | Source messages: Yes</div>
+    <div class="q-rubric">
+      <div class="q-rubric-label">Expected Answer (Rubric)</div>
+      <div class="q-rubric-text">LLM response should contain: you and your spouse have actively nurtured your relationship through a variety of meaningful activities and rituals; LLM response should contain: Starting with extended coffee chats and brainstorming sessions at Brew Haven, you established a strong foundation of communication and excitement; LLM response should contain: You introduced regular at-home rituals like weekly sunset dates and storytelling nights to recreate honeymoon memories, enhancing emotional intimacy; LLM response should contain: Collaborative efforts such as selecting photos, reviewing online content, and planning future travel and budgets further strengthened your teamwork and synergy; LLM response should contain: you balanced deep reflections on personal growth and trust with lighter, engaging conversations and activities, consistently rating your connection around 9/10</div>
+    </div>
+  </div>
+  <div class="q-item">
+    <div class="q-header">
+      <div class="q-num">Q177</div>
+      <div class="q-text">Can you give me a summary of how my spouse and I planned and prepared for our Maldives honeymoon, including the key decisions and arrangements we made along the way from September 21, 2024 to October 3, 2024?</div>
+      <span class="q-badge badge-partial">◐ 0.2</span>
+    </div>
+    <div class="q-detail">Score: 0.2 | Match: 1/5 | Difficulty: medium | Source messages: Yes</div>
+    <div class="q-rubric">
+      <div class="q-rubric-label">Expected Answer (Rubric)</div>
+      <div class="q-rubric-text">LLM response should contain: You and your spouse carefully planned your Maldives honeymoon by first confirming your $10,800 booking for a 6-night stay at Soneva Jani, ensuring all details were accurate and the deposit was paid; LLM response should contain: You coordinated with family by updating your mom on your 15-day travel itinerary and made arrangements for your daughters' care; LLM response should contain: you double-checked seaplane transfer times aiming for a 9 AM departure and confirmed your $50,000 medical coverage with Allianz for peace of mind; LLM response should contain: You allocated 6 days for activities within your 15-day plan, selecting a mix of relaxation and adventure, and chose luxury items like $120 evening dresses for special dinners; LLM response should contain: you maintained open communication with your spouse to align expectations, manage logistics, and build excitement for your trip, culminating in a well-organized and thoughtfully prepared honeymoon experience</div>
+    </div>
+  </div>
+  <div class="q-item">
+    <div class="q-header">
+      <div class="q-num">Q196</div>
+      <div class="q-text">Can you summarize how my wedding décor plans have developed from July 1, 2023 to July 6, 2023, including how I've incorporated personal touches, managed the budget, and balanced different theme ideas?</div>
+      <span class="q-badge badge-partial">◐ 0.5</span>
+    </div>
+    <div class="q-detail">Score: 0.5 | Match: 2/4 | Difficulty: medium | Source messages: Yes</div>
+    <div class="q-rubric">
+      <div class="q-rubric-label">Expected Answer (Rubric)</div>
+      <div class="q-rubric-text">LLM response should contain: you focused on incorporating sentimental items like Laura's lace and family photos to add emotional depth; LLM response should contain: you prioritized key décor elements such as flowers, lighting, and custom artisan pieces while adjusting your budget to accommodate these priorities; LLM response should contain: You also worked on blending your preference for a minimalist 'Coastal Serenity' theme with Tracy's desire for decorative accents; LLM response should contain: you incorporated eco-friendly choices, including recycled cotton napkins and solar-powered lighting, ensuring sustainability aligned with your aesthetic</div>
+    </div>
+  </div>
+  <div class="q-item">
+    <div class="q-header">
+      <div class="q-num">Q197</div>
+      <div class="q-text">Can you give me a summary of how the venue wrap-up and equipment return process developed throughout our planning, including how I coordinated with vendors and Ka'anapali staff to meet all deadlines and secure refunds?</div>
+      <span class="q-badge badge-fail">✗ 0.0</span>
+    </div>
+    <div class="q-detail">Score: 0.0 | Match: 0/5 | Difficulty: medium | Source messages: None (abstention)</div>
+    <div class="q-rubric">
+      <div class="q-rubric-label">Expected Answer (Rubric)</div>
+      <div class="q-rubric-text">LLM response should contain: you established clear communication with Ka'anapali staff to define cleanup standards, such as clearing specific beach areas to meet refund criteria; LLM response should contain: organized the return of various rented equipment, prioritizing items with earlier deadlines and higher late fees, like lanterns and tables; LLM response should contain: managed waste disposal responsibly, engaging services like Green Maui and Island Cleanup; LLM response should contain: you documented all processes meticulously, including inspections and returns, to provide evidence for refunds and compliance; LLM response should contain: Regular follow-ups and contingency plans were implemented to address any issues promptly, ensuring smooth vendor exits and final venue restoration</div>
+    </div>
+  </div>
+
+<h3 id="temporal_reasoning" style="color:var(--gold-bright);margin-top:2rem;padding-top:1rem;border-top:1px solid rgba(201,162,75,0.15);">Temporal Reasoning — 100.0% (20.0/20)</h3>
+  <div class="q-item">
+    <div class="q-header">
+      <div class="q-num">Q18</div>
+      <div class="q-text">How many days are there between when I launch the testing suite development and when I start the deployment preparation for the RAG system?</div>
+      <span class="q-badge badge-pass">✓ 1.0</span>
+    </div>
+    <div class="q-detail">Score: 1.0 | Match: 2/2 | Difficulty: easy | Source messages: Yes</div>
+    <div class="q-rubric">
+      <div class="q-rubric-label">Expected Answer (Rubric)</div>
+      <div class="q-rubric-text">LLM response should state: 14 days; LLM response should state: from February 15, 2025 till March 1, 2025</div>
+    </div>
+  </div>
+  <div class="q-item">
+    <div class="q-header">
+      <div class="q-num">Q19</div>
+      <div class="q-text">How many days passed between when I started working on the context window management module and when I began developing the query rewriting pipelines for our RAG system?</div>
+      <span class="q-badge badge-pass">✓ 1.0</span>
+    </div>
+    <div class="q-detail">Score: 1.0 | Match: 2/2 | Difficulty: easy | Source messages: Yes</div>
+    <div class="q-rubric">
+      <div class="q-rubric-label">Expected Answer (Rubric)</div>
+      <div class="q-rubric-text">LLM response should state: 45 days; LLM response should state: from November 1, 2024 till December 16, 2024</div>
+    </div>
+  </div>
+  <div class="q-item">
+    <div class="q-header">
+      <div class="q-num">Q38</div>
+      <div class="q-text">How many days are there between when I start setting up the deployment pipeline and when I begin the production monitoring and maintenance planning phase?</div>
+      <span class="q-badge badge-pass">✓ 1.0</span>
+    </div>
+    <div class="q-detail">Score: 1.0 | Match: 2/2 | Difficulty: easy | Source messages: Yes</div>
+    <div class="q-rubric">
+      <div class="q-rubric-label">Expected Answer (Rubric)</div>
+      <div class="q-rubric-text">LLM response should state: 15 days; LLM response should state: from February 1, 2025 till February 16, 2025</div>
+    </div>
+  </div>
+  <div class="q-item">
+    <div class="q-header">
+      <div class="q-num">Q39</div>
+      <div class="q-text">How many days after I started the research phase did I begin the architecture design phase for the self-driving car simulation project?</div>
+      <span class="q-badge badge-pass">✓ 1.0</span>
+    </div>
+    <div class="q-detail">Score: 1.0 | Match: 2/2 | Difficulty: easy | Source messages: Yes</div>
+    <div class="q-rubric">
+      <div class="q-rubric-label">Expected Answer (Rubric)</div>
+      <div class="q-rubric-text">LLM response should state: 15 days; LLM response should state: from July 1, 2025 till July 16, 2025</div>
+    </div>
+  </div>
+  <div class="q-item">
+    <div class="q-header">
+      <div class="q-num">Q58</div>
+      <div class="q-text">How many days after I finished finalizing stakeholder interviews did I start focusing on setting up the development environment?</div>
+      <span class="q-badge badge-pass">✓ 1.0</span>
+    </div>
+    <div class="q-detail">Score: 1.0 | Match: 2/2 | Difficulty: easy | Source messages: Yes</div>
+    <div class="q-rubric">
+      <div class="q-rubric-label">Expected Answer (Rubric)</div>
+      <div class="q-rubric-text">LLM response should state: 10 days; LLM response should state: from 2024-07-09 till 2024-07-19</div>
+    </div>
+  </div>
+  <div class="q-item">
+    <div class="q-header">
+      <div class="q-num">Q59</div>
+      <div class="q-text">How many days after I started the comprehensive testing suite phase did I begin setting up the deployment pipeline?</div>
+      <span class="q-badge badge-pass">✓ 1.0</span>
+    </div>
+    <div class="q-detail">Score: 1.0 | Match: 2/2 | Difficulty: easy | Source messages: Yes</div>
+    <div class="q-rubric">
+      <div class="q-rubric-label">Expected Answer (Rubric)</div>
+      <div class="q-rubric-text">LLM response should state: 12 days; LLM response should state: from January 21, 2025 till February 1, 2025</div>
+    </div>
+  </div>
+  <div class="q-item">
+    <div class="q-header">
+      <div class="q-num">Q78</div>
+      <div class="q-text">How many days passed between when I started intensifying my PDE preparation by targeting weak areas and when I began focusing on improving my note-taking and problem-solving methods?</div>
+      <span class="q-badge badge-pass">✓ 1.0</span>
+    </div>
+    <div class="q-detail">Score: 1.0 | Match: 2/2 | Difficulty: easy | Source messages: Yes</div>
+    <div class="q-rubric">
+      <div class="q-rubric-label">Expected Answer (Rubric)</div>
+      <div class="q-rubric-text">LLM response should state: 13 days; LLM response should state: from July 7, 2024 till July 20, 2024</div>
+    </div>
+  </div>
+  <div class="q-item">
+    <div class="q-header">
+      <div class="q-num">Q79</div>
+      <div class="q-text">How many days after I started learning the fundamental concepts of PDEs did I begin studying separation of variables and Fourier series?</div>
+      <span class="q-badge badge-pass">✓ 1.0</span>
+    </div>
+    <div class="q-detail">Score: 1.0 | Match: 2/2 | Difficulty: easy | Source messages: Yes</div>
+    <div class="q-rubric">
+      <div class="q-rubric-label">Expected Answer (Rubric)</div>
+      <div class="q-rubric-text">LLM response should state: 46 days; LLM response should state: from August 1, 2024 till September 16, 2024</div>
+    </div>
+  </div>
+  <div class="q-item">
+    <div class="q-header">
+      <div class="q-num">Q98</div>
+      <div class="q-text">How many days passed between when I started exploring applications of functional analysis in quantum mechanics and when I began advanced problem solving in functional spaces?</div>
+      <span class="q-badge badge-pass">✓ 1.0</span>
+    </div>
+    <div class="q-detail">Score: 1.0 | Match: 2/2 | Difficulty: easy | Source messages: Yes</div>
+    <div class="q-rubric">
+      <div class="q-rubric-label">Expected Answer (Rubric)</div>
+      <div class="q-rubric-text">LLM response should state: 45 days; LLM response should state: from April 1, 2025 till May 16, 2025</div>
+    </div>
+  </div>
+  <div class="q-item">
+    <div class="q-header">
+      <div class="q-num">Q99</div>
+      <div class="q-text">How many days after I started exploring compact operators did I begin synthesizing functional analysis concepts?</div>
+      <span class="q-badge badge-pass">✓ 1.0</span>
+    </div>
+    <div class="q-detail">Score: 1.0 | Match: 2/2 | Difficulty: easy | Source messages: Yes</div>
+    <div class="q-rubric">
+      <div class="q-rubric-label">Expected Answer (Rubric)</div>
+      <div class="q-rubric-text">LLM response should state: 27 days; LLM response should state: from February 16 till March 15</div>
+    </div>
+  </div>
+  <div class="q-item">
+    <div class="q-header">
+      <div class="q-num">Q118</div>
+      <div class="q-text">How many days passed between when I started preparing for my ukulele journey and when I began my first active practice session?</div>
+      <span class="q-badge badge-pass">✓ 1.0</span>
+    </div>
+    <div class="q-detail">Score: 1.0 | Match: 2/2 | Difficulty: easy | Source messages: Yes</div>
+    <div class="q-rubric">
+      <div class="q-rubric-label">Expected Answer (Rubric)</div>
+      <div class="q-rubric-text">LLM response should state: 31 days; LLM response should state: from March 1, 2021 till April 1, 2021</div>
+    </div>
+  </div>
+  <div class="q-item">
+    <div class="q-header">
+      <div class="q-num">Q119</div>
+      <div class="q-text">How many days passed between when I was exploring performance opportunities with my ukulele and when I started journaling about my ukulele journey?</div>
+      <span class="q-badge badge-pass">✓ 1.0</span>
+    </div>
+    <div class="q-detail">Score: 1.0 | Match: 2/2 | Difficulty: easy | Source messages: Yes</div>
+    <div class="q-rubric">
+      <div class="q-rubric-label">Expected Answer (Rubric)</div>
+      <div class="q-rubric-text">LLM response should state: 31 days; LLM response should state: from September 9, 2021 till October 10, 2021</div>
+    </div>
+  </div>
+  <div class="q-item">
+    <div class="q-header">
+      <div class="q-num">Q138</div>
+      <div class="q-text">How many months passed between my teaching feedback review and when I started reflecting on my personal relationships?</div>
+      <span class="q-badge badge-pass">✓ 1.0</span>
+    </div>
+    <div class="q-detail">Score: 1.0 | Match: 2/2 | Difficulty: easy | Source messages: Yes</div>
+    <div class="q-rubric">
+      <div class="q-rubric-label">Expected Answer (Rubric)</div>
+      <div class="q-rubric-text">LLM response should state: 10 months; LLM response should state: from April 1, 2020 till February 1, 2021</div>
+    </div>
+  </div>
+  <div class="q-item">
+    <div class="q-header">
+      <div class="q-num">Q139</div>
+      <div class="q-text">How many days were there between when I started exploring new educational interests and when I began planning my travel for a mental recharge?</div>
+      <span class="q-badge badge-pass">✓ 1.0</span>
+    </div>
+    <div class="q-detail">Score: 1.0 | Match: 2/2 | Difficulty: easy | Source messages: Yes</div>
+    <div class="q-rubric">
+      <div class="q-rubric-label">Expected Answer (Rubric)</div>
+      <div class="q-rubric-text">LLM response should state: 92 days; LLM response should state: from May 1, 2022 till August 1, 2022</div>
+    </div>
+  </div>
+  <div class="q-item">
+    <div class="q-header">
+      <div class="q-num">Q158</div>
+      <div class="q-text">How many days passed between when I started the final preparations for our road trip and when we actually began the trip?</div>
+      <span class="q-badge badge-pass">✓ 1.0</span>
+    </div>
+    <div class="q-detail">Score: 1.0 | Match: 2/2 | Difficulty: easy | Source messages: Yes</div>
+    <div class="q-rubric">
+      <div class="q-rubric-label">Expected Answer (Rubric)</div>
+      <div class="q-rubric-text">LLM response should state: 58 days; LLM response should state: from January 2, 2023 till March 1, 2023</div>
+    </div>
+  </div>
+  <div class="q-item">
+    <div class="q-header">
+      <div class="q-num">Q159</div>
+      <div class="q-text">How many days passed between when I started the final stretch of our road trip at Motel 6 in Culver City and when I got back home to New Jeffreytown and began unpacking?</div>
+      <span class="q-badge badge-pass">✓ 1.0</span>
+    </div>
+    <div class="q-detail">Score: 1.0 | Match: 2/2 | Difficulty: easy | Source messages: Yes</div>
+    <div class="q-rubric">
+      <div class="q-rubric-label">Expected Answer (Rubric)</div>
+      <div class="q-rubric-text">LLM response should state: 8 days; LLM response should state: from April 8 till April 16</div>
+    </div>
+  </div>
+  <div class="q-item">
+    <div class="q-header">
+      <div class="q-num">Q178</div>
+      <div class="q-text">How many days passed between my last full day at Soneva Jani and when I started reflecting on our honeymoon back home?</div>
+      <span class="q-badge badge-pass">✓ 1.0</span>
+    </div>
+    <div class="q-detail">Score: 1.0 | Match: 2/2 | Difficulty: easy | Source messages: Yes</div>
+    <div class="q-rubric">
+      <div class="q-rubric-label">Expected Answer (Rubric)</div>
+      <div class="q-rubric-text">LLM response should state: 3 days; LLM response should state: from October 14 till October 17</div>
+    </div>
+  </div>
+  <div class="q-item">
+    <div class="q-header">
+      <div class="q-num">Q179</div>
+      <div class="q-text">How many days passed between when I started the exploration phase of our honeymoon and when we had our first romantic beach dinner at Soneva Jani?</div>
+      <span class="q-badge badge-pass">✓ 1.0</span>
+    </div>
+    <div class="q-detail">Score: 1.0 | Match: 2/2 | Difficulty: easy | Source messages: Yes</div>
+    <div class="q-rubric">
+      <div class="q-rubric-label">Expected Answer (Rubric)</div>
+      <div class="q-rubric-text">LLM response should state: 4 days; LLM response should state: from October 4 till October 8</div>
+    </div>
+  </div>
+  <div class="q-item">
+    <div class="q-header">
+      <div class="q-num">Q198</div>
+      <div class="q-text">How many days do I have to finalize the guest list and travel plans before the wedding event launch begins?</div>
+      <span class="q-badge badge-pass">✓ 1.0</span>
+    </div>
+    <div class="q-detail">Score: 1.0 | Match: 2/2 | Difficulty: easy | Source messages: Yes</div>
+    <div class="q-rubric">
+      <div class="q-rubric-label">Expected Answer (Rubric)</div>
+      <div class="q-rubric-text">LLM response should state: 3 days; LLM response should state: from July 7 till July 10</div>
+    </div>
+  </div>
+  <div class="q-item">
+    <div class="q-header">
+      <div class="q-num">Q199</div>
+      <div class="q-text">How many days after the start of closing our wedding at Ka'anapali Beach did my reflection period begin?</div>
+      <span class="q-badge badge-pass">✓ 1.0</span>
+    </div>
+    <div class="q-detail">Score: 1.0 | Match: 2/2 | Difficulty: easy | Source messages: Yes</div>
+    <div class="q-rubric">
+      <div class="q-rubric-label">Expected Answer (Rubric)</div>
+      <div class="q-rubric-text">LLM response should state: 10 days; LLM response should state: from August 11 till August 21</div>
+    </div>
+  </div>
+</div>
+
+<div class="footer">
+  <p>Vetta — <a href="https://cem888.ai">CEM888.AI</a> — June 2026</p>
+  <p style="margin-top:0.5rem;">DeepSeek V4 Pro · Honest retrieval · No answer keys</p>
+</div>
+</div>
+</body>
+</html>
