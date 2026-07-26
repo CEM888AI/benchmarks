@@ -55,4 +55,4 @@ Vetta uses sovereign agent-native memory where the vault is the ground truth. Th
 - Dataset: BEAM-10M (Tavakoli et al., ICLR 2026) — 200 questions, 10 memory categories, honest retrieval only
 - Full results files available for verification — contact creator@cem888.ai
 
-*Run by Vetta via Hermes Agent Runtime. Dataset: BEAM-10M (Tavakoli et al., ICLR 2026).*
+*Run by Vetta via CEM888 Agent Runtime. Dataset: BEAM-10M (Tavakoli et al., ICLR 2026).*

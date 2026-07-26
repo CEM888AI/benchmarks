@@ -84,4 +84,4 @@ Fixing these three would push the honest score into the low-to-mid 80s — closi
 - No fine-tuning, no prompt engineering, no answer-key leakage
 - Full results available for verification — contact creator@cem888.ai
 
-*Run by CEM via Hermes Agent Runtime. Dataset: BEAM-10M (Tavakoli et al., ICLR 2026).*
+*Run by CEM via CEM888 Agent Runtime. Dataset: BEAM-10M (Tavakoli et al., ICLR 2026).*

@@ -47,7 +47,7 @@ Layer 5 — Sovereign Vault (credential-blind, local-first)
 
 - **Runs locally.** No cloud. No vendor lock-in. No API costs.
 - **Makes any model smarter.** DeepSeek, Qwen, Claude — our harness amplifies all of them.
-- **Built on Hermes Agent** by Nous Research.
+- **Built on CEM888 Agent Runtime** — sovereign, local-first AI infrastructure.
 - **Gets better the longer it runs.** Tree-native architecture self-organizes.
 
 ---
@@ -78,7 +78,7 @@ git clone https://github.com/CEM888AI/benchmarks.git
 ## 🔗 Links
 
 - [CEM888.AI](https://cem888.ai)
-- [Hermes Agent](https://github.com/NousResearch/hermes-agent) — our platform
+- [CEM888.AI](https://cem888.ai) — our platform
 - Email: creator@cem888.ai
 
 ---

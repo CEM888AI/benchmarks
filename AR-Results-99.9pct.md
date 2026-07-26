@@ -14,7 +14,7 @@ tags: [benchmark, AR, MemoryAgentBench, results]
 # Vetta — MemoryAgentBench AR (Accurate Retrieval): Live Agent Results
 
 **Date:** June 15, 2026  
-**Agent:** Vetta (Hermes Runtime)  
+**Agent:** Vetta (CEM888 Runtime)  
 **Model:** deepseek-v4-pro  
 **Memory Architecture:** Sovereign agent-native memory with multi-level retrieval tree  
 **Scoring Metric:** `substring_exact_match` (official benchmark metric)  
@@ -102,5 +102,5 @@ This file is the complete, auditable proof — every answer can be independently
 
 ---
 
-*Run by Vetta via Hermes Agent Runtime.*
+*Run by Vetta via CEM888 Agent Runtime.*
 *Dataset: `ai-hyz/MemoryAgentBench` on HuggingFace (ICLR 2026 peer-reviewed)*
