@@ -62,6 +62,12 @@ def score_all(answers_file, rubrics_file, output_file=None):
             rubrics = json.load(f)
     else:
         rubrics = rubrics_file
+
+    # Normalize: the shipped corpus (beam_question_contexts.json) is a LIST of
+    # {qid, rubric, category, ...} objects; the scorer below expects a dict keyed
+    # by str(qid). Accept both shapes so the published pair runs as-is.
+    if isinstance(rubrics, list):
+        rubrics = {str(q.get('qid')): q for q in rubrics if q.get('qid') is not None}
     
     # Load answers
     answers = {}
@@ -157,12 +163,62 @@ def score_all(answers_file, rubrics_file, output_file=None):
     
     return output
 
+def verify_scorecard(scorecard_file):
+    """
+    Scorecard mode: recompute a published overall score from a results JSONL
+    whose lines carry {qid, category, score, match}. The score column already
+    holds fractional per-question credit (e.g. 12/20 rubric items matched =
+    0.6), and the published overall is the UNWEIGHTED mean of per-question
+    scores — not a ratio of rubric items — so this sums `score` over questions.
+    """
+    total = 0.0
+    n = 0
+    category_totals = {}
+    with open(scorecard_file) as f:
+        for line in f:
+            line = line.strip()
+            if not line:
+                continue
+            try:
+                obj = json.loads(line)
+            except json.JSONDecodeError:
+                continue
+            score = obj.get('score')
+            if score is None:
+                continue
+            total += score
+            n += 1
+            cat = obj.get('category', 'unknown')
+            if cat not in category_totals:
+                category_totals[cat] = {'sum': 0.0, 'n': 0}
+            category_totals[cat]['sum'] += score
+            category_totals[cat]['n'] += 1
+
+    overall = (total / n * 100) if n else 0.0
+    print("\n" + "=" * 50)
+    print("BEAM SCORECARD VERIFICATION")
+    print("=" * 50)
+    print(f"Overall: {overall:.1f}% ({total:.1f}/{n})")
+    print(f"Questions: {n}")
+    print("\nCategory Breakdown:")
+    for cat in sorted(category_totals.keys()):
+        c = category_totals[cat]
+        pct = (c['sum'] / c['n'] * 100) if c['n'] else 0
+        print(f"  {cat:30s}: {pct:5.1f}% ({c['n']}q)")
+    return {'overall_pct': round(overall, 1), 'total_raw': round(total, 2),
+            'questions_scored': n}
+
 if __name__ == '__main__':
-    if len(sys.argv) < 3:
-        print("Usage: beam_score.py <answers.jsonl> <rubrics.json> [output.json]")
+    if len(sys.argv) >= 2 and sys.argv[1] == '--check':
+        scorecard = sys.argv[2] if len(sys.argv) > 2 else 'vetta_beam_v9_results.jsonl'
+        verify_scorecard(scorecard)
+    elif len(sys.argv) < 3:
+        print("Usage:")
+        print("  beam_score.py <answers.jsonl> <rubrics.json> [output.json]   # score raw answers")
+        print("  beam_score.py --check <results.jsonl>                        # verify a published scorecard")
         sys.exit(1)
-    
-    answers = sys.argv[1]
-    rubrics = sys.argv[2]
-    output = sys.argv[3] if len(sys.argv) > 3 else None
-    score_all(answers, rubrics, output)
+    else:
+        answers = sys.argv[1]
+        rubrics = sys.argv[2]
+        output = sys.argv[3] if len(sys.argv) > 3 else None
+        score_all(answers, rubrics, output)

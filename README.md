@@ -1,5 +1,7 @@
 # CEM888.AI — Memory Benchmarks
 
+CEM888 is a local-first state and continuity runtime for AI agents — memory, identity, and project state that live on your machine and persist across Claude, ChatGPT, Codex, and Copilot.
+
 Public, reproducible memory-retrieval results for CEM888's runtime, run as a live agent — not a static embeddings pipeline — against independent third-party benchmark datasets. Every number below links to its full write-up and raw scoring detail in this repo.
 
 ## Results
@@ -73,6 +75,28 @@ git clone https://github.com/CEM888AI/benchmarks.git
 - `beam_question_contexts.json` / `beam_score.py` — BEAM test corpus and scorer
 - `vetta_beam_v9_results.jsonl`, `vetta_live_results.jsonl` — per-question raw results
 - `beam-full-results.html` — interactive results viewer
+
+## Verify the published score
+
+```
+git clone https://github.com/CEM888AI/benchmarks.git
+cd benchmarks
+python beam_score.py --check vetta_beam_v9_results.jsonl
+```
+
+Recomputes the published Vetta BEAM-10M score from the shipped scorecard. The
+`score` column carries fractional per-question credit (e.g. 12/20 rubric items
+matched = 0.6), and 77.2% is the unweighted mean across all 200 questions:
+142 full-credit + 34 partial (12.4 combined) = 154.4/200.
+
+Expected output: `Overall: 77.2% (154.4/200)`
+
+To score raw answers against the corpus yourself, pass an answers JSONL
+(`{qid, answer}` per line) plus the rubric file:
+
+```
+python beam_score.py answers.jsonl beam_question_contexts.json
+```
 
 ## What's being tested
 
