@@ -4,6 +4,8 @@ CEM888 is a local-first state and continuity runtime for AI agents — memory, i
 
 Public, reproducible memory-retrieval results for CEM888's runtime, run as a live agent — not a static embeddings pipeline — against independent third-party benchmark datasets. Every number below links to its full write-up and raw scoring detail in this repo.
 
+> Part of **[CEM888.AI](https://github.com/CEM888AI)** · flagship overview: **[cem888](https://github.com/CEM888AI/cem888)**
+
 ## Results
 
 ### MemoryAgentBench — Accurate Retrieval (AR)
