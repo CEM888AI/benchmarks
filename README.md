@@ -1,10 +1,11 @@
-# CEM888.AI — Memory Benchmarks
+# CEM888 — Memory Benchmarks
 
-CEM888 is a local-first state and continuity runtime for AI agents — memory, identity, and project state that live on your machine and persist across Claude, ChatGPT, Codex, and Copilot.
+> ### ⬅️ This is supporting evidence, not the project.
+> **CEM888** is a local-first, model-agnostic agent runtime — state, identity, authority, and verification that live on your machine and persist across Claude, GPT, DeepSeek, and local models.
+>
+> **→ [cem888.ai](https://cem888.ai)** · [All CEM888 repositories](https://github.com/CEM888AI) · [💗 Sponsor](https://ko-fi.com/cem888ai)
 
 Public, reproducible memory-retrieval results for CEM888's runtime, run as a live agent — not a static embeddings pipeline — against independent third-party benchmark datasets. Every number below links to its full write-up and raw scoring detail in this repo.
-
-> Part of **[CEM888.AI](https://github.com/CEM888AI)** · flagship overview: **[cem888](https://github.com/CEM888AI/cem888)**
 
 ## Results
 
@@ -102,8 +103,10 @@ python beam_score.py answers.jsonl beam_question_contexts.json
 
 ## What's being tested
 
-These scores are produced by CEM888's memory runtime, not a standalone retrieval library — a tree-structured memory store (session / episodic / semantic / procedural / vault layers) that a live agent queries as part of normal execution. The implementation is proprietary; what's public here is the methodology, the raw results, and enough of the architecture (in [runtime-case-studies](https://github.com/CEM888AI/runtime-case-studies)) to evaluate whether the results are credible.
+These scores are produced by CEM888's memory runtime, not a standalone retrieval library — a tree-structured memory store (session / episodic / semantic / procedural / vault layers) that a live agent queries as part of normal execution. What's public here is the methodology, the raw results, and enough of the architecture (in [runtime-case-studies](https://github.com/CEM888AI/runtime-case-studies)) to evaluate whether the results are credible.
 
-## Contact
+---
 
-Built by Chandler Morone. Questions on methodology or raw data: creator@cem888.ai · [cem888.ai](https://cem888.ai)
+**CEM888** — local-first agent runtime. **[cem888.ai](https://cem888.ai)** · [💗 Sponsor](https://ko-fi.com/cem888ai) · creator@cem888.ai
+
+Built by Chandler Morone. Questions on methodology or raw data: creator@cem888.ai
