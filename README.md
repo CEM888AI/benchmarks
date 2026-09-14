@@ -3,7 +3,7 @@
 > ### ⬅️ This is supporting evidence, not the project.
 > **CEM888** is a local-first, model-agnostic agent runtime — state, identity, authority, and verification that live on your machine and persist across Claude, GPT, DeepSeek, and local models.
 >
-> **→ [cem888.ai](https://cem888.ai)** · [All CEM888 repositories](https://github.com/CEM888AI) · [💗 Sponsor](https://ko-fi.com/cem888ai)
+> **→ The project: [CEM888AI/cem888](https://github.com/CEM888AI/cem888)** — ⭐ star it · [cem888.ai](https://cem888.ai) · [💗 Sponsor](https://ko-fi.com/cem888ai)
 
 Public, reproducible memory-retrieval results for CEM888's runtime, run as a live agent — not a static embeddings pipeline — against independent third-party benchmark datasets. Every number below links to its full write-up and raw scoring detail in this repo.
 
@@ -107,6 +107,6 @@ These scores are produced by CEM888's memory runtime, not a standalone retrieval
 
 ---
 
-**CEM888** — local-first agent runtime. **[cem888.ai](https://cem888.ai)** · [💗 Sponsor](https://ko-fi.com/cem888ai) · creator@cem888.ai
+**CEM888** — local-first agent runtime. **[⭐ Star the repo](https://github.com/CEM888AI/cem888)** · [cem888.ai](https://cem888.ai) · [💗 Sponsor](https://ko-fi.com/cem888ai) · creator@cem888.ai
 
 Built by Chandler Morone. Questions on methodology or raw data: creator@cem888.ai
