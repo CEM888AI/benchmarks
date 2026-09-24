@@ -89,8 +89,9 @@ python beam_score.py --check vetta_beam_v9_results.jsonl
 
 Recomputes the published Vetta BEAM-10M score from the shipped scorecard. For
 each line, the checker validates that the stored fractional `score` agrees with
-the stored `match` fraction (for example, `12/20 -> 0.6`), rejects duplicate
-question IDs, reports the scorecard SHA-256, then computes the unweighted mean
+the stored `match` fraction at the scorecard's two-decimal precision (for
+example, `12/20 -> 0.60`), rejects duplicate question IDs, reports the
+scorecard SHA-256, then computes the unweighted mean
 across questions.
 
 For the published Vetta scorecard the expected result is:
