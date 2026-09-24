@@ -26,7 +26,7 @@ CEM achieved **78.2%** on the BEAM-10M memory benchmark using purely honest retr
 
 ## Category Breakdown
 
-20 questions per category × 10 categories = 200 total. Scoring: substring_exact_match against rubric.
+20 questions per category × 10 categories = 200 total. The 78.2% figure is retained here as an **experimental recorded run**, not as a fully reproducible public scorecard: this repository does not currently ship the CEM 78.2% per-question JSONL needed for the same `--check` verification available for Vetta's 77.2%.
 
 | Category | Score | Notes |
 |----------|-------|-------|
@@ -80,8 +80,8 @@ Fixing these three would push the honest score into the low-to-mid 80s — closi
 
 - Engine: deepseek-v4-pro
 - Dataset: BEAM-10M (Tavakoli et al., ICLR 2026) — 200 questions, 10 memory categories
-- Scoring: substring_exact_match against rubric
-- No fine-tuning, no prompt engineering, no answer-key leakage
-- Full results available for verification — contact creator@cem888.ai
+- Status: experimental recorded run; the public per-question scorecard needed for independent arithmetic verification is not currently present in this repository
+- No fine-tuning or answer-key access is claimed for the accepted run; the write-up records the rejected rubric-echo run separately
+- Until the per-question scorecard is published, use Vetta's 77.2% as the repository's independently checkable BEAM result
 
 *Run by CEM via CEM888 Agent Runtime. Dataset: BEAM-10M (Tavakoli et al., ICLR 2026).*
