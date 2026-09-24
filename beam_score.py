@@ -228,10 +228,13 @@ def verify_scorecard(scorecard_file):
             continue
 
         expected_score = numerator / denominator
-        if abs(float(score) - expected_score) > 1e-9:
+        # Published scorecards store fractional credit rounded to 2 decimals.
+        # Validate against that stored precision rather than the infinite ratio.
+        expected_stored_score = round(expected_score, 2)
+        if abs(float(score) - expected_stored_score) > 1e-9:
             errors.append(
                 f"line {line_number}: score={score!r} does not match "
-                f"{match!r} ({expected_score:.12g})"
+                f"{match!r} at stored 2-decimal precision ({expected_stored_score:.2f})"
             )
             continue
 
