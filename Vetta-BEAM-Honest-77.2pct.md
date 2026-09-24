@@ -32,9 +32,9 @@ The 2 misses represent: one synonym gap between source document and answer key (
 
 ### BEAM Memory — 77.2% (142 full + 12.4 partial / 200)
 
-- **File:** `MABench/vetta_beam_v9_final.jsonl`
+- **Public scorecard:** [`vetta_beam_v9_results.jsonl`](./vetta_beam_v9_results.jsonl)
 - **Method:** Honest retrieval + agent reasoning
-- **Scoring:** substring_exact_match against rubric
+- **Published score:** unweighted mean of the shipped per-question fractional scorecard; `python beam_score.py --check vetta_beam_v9_results.jsonl` validates each `score` against its `match` fraction and recomputes the aggregate
 - **Category breakdown:** 20 questions × 10 categories (abstention, contradiction_resolution, event_ordering, information_extraction, instruction_following, knowledge_update, multi_session_reasoning, preference_following, summarization, temporal_reasoning)
 
 **Performance relative to baselines:**
@@ -53,6 +53,7 @@ Vetta uses sovereign agent-native memory where the vault is the ground truth. Th
 - Both tests were run by the same agent (Vetta/deepseek-v4-pro)
 - No fine-tuning, no prompt engineering, no answer-key leakage
 - Dataset: BEAM-10M (Tavakoli et al., ICLR 2026) — 200 questions, 10 memory categories, honest retrieval only
-- Full results files available for verification — contact creator@cem888.ai
+- Public Vetta scorecard is shipped in this repository and can be checked with `python beam_score.py --check vetta_beam_v9_results.jsonl`
+- That checker verifies scorecard consistency and arithmetic; it does not recreate the original live-agent generation environment
 
 *Run by Vetta via CEM888 Agent Runtime. Dataset: BEAM-10M (Tavakoli et al., ICLR 2026).*
