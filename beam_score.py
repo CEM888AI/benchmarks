@@ -92,7 +92,9 @@ def score_all(answers_file, rubrics_file, output_file=None):
             except json.JSONDecodeError:
                 # Try to handle multi-JSON lines
                 continue
-            qid = obj.get('qid') or obj.get('question_id')
+            qid = obj.get('qid')
+            if qid is None:
+                qid = obj.get('question_id')
             if qid is not None:
                 answers[qid] = obj.get('answer', '')
     
@@ -179,8 +181,8 @@ def verify_scorecard(scorecard_file):
     Verify a published scorecard and recompute its unweighted question mean.
 
     Required row shape: {qid, category, score, match}. "match" must be a
-    fraction such as "12/20"; "score" must equal that fraction within a small
-    floating-point tolerance. Duplicate qids are rejected.
+    fraction such as "12/20"; "score" must equal that fraction at the
+    scorecard\'s stored two-decimal precision. Duplicate qids are rejected.
     """
     path = Path(scorecard_file)
     payload = path.read_bytes()
