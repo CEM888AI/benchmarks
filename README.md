@@ -5,7 +5,7 @@
 >
 > **→ The project: [CEM888AI/cem888](https://github.com/CEM888AI/cem888)** — ⭐ star it · [cem888.ai](https://cem888.ai) · [💗 Sponsor](https://ko-fi.com/cem888ai)
 
-Public, reproducible memory-retrieval results for CEM888's runtime, run as a live agent — not a static embeddings pipeline — against independent third-party benchmark datasets. Every number below links to its full write-up and raw scoring detail in this repo.
+Public benchmark artifacts for CEM888's runtime, run as a live agent — not a static embeddings pipeline — against independent third-party benchmark datasets. This repo ships the published result files, scoring detail, and a checker for the reported BEAM scorecard. It does **not** claim that the original live-agent generation environment can be recreated from this repository alone.
 
 ## Results
 
@@ -87,19 +87,35 @@ cd benchmarks
 python beam_score.py --check vetta_beam_v9_results.jsonl
 ```
 
-Recomputes the published Vetta BEAM-10M score from the shipped scorecard. The
-`score` column carries fractional per-question credit (e.g. 12/20 rubric items
-matched = 0.6), and 77.2% is the unweighted mean across all 200 questions:
-142 full-credit + 34 partial (12.4 combined) = 154.4/200.
+Recomputes the published Vetta BEAM-10M score from the shipped scorecard. For
+each line, the checker validates that the stored fractional `score` agrees with
+the stored `match` fraction (for example, `12/20 -> 0.6`), rejects duplicate
+question IDs, reports the scorecard SHA-256, then computes the unweighted mean
+across questions.
 
-Expected output: `Overall: 77.2% (154.4/200)`
+For the published Vetta scorecard the expected result is:
+`Overall: 77.2% (154.4/200)`.
 
-To score raw answers against the corpus yourself, pass an answers JSONL
-(`{qid, answer}` per line) plus the rubric file:
+**What this proves:** the published JSONL is internally consistent and the
+reported aggregate follows from the shipped per-question scorecard.
+
+**What this does not prove:** that the answers were generated under the claimed
+live-agent conditions. The original live run, model/runtime configuration and
+retrieval environment are described in the run write-up but are not fully
+recreated by `--check`.
+
+The second mode scores a separate raw-answer JSONL against the shipped rubric
+file:
 
 ```
 python beam_score.py answers.jsonl beam_question_contexts.json
 ```
+
+That raw-answer helper uses the implementation visible in `beam_score.py`:
+each rubric item receives credit for a case-insensitive substring match or
+>=60% normalized word overlap, and its summary is rubric-item-weighted. It is a
+separate audit utility; it is **not** the algorithm used by `--check` to
+recompute the published 77.2% scorecard.
 
 ## What's being tested
 
