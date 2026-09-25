@@ -1,129 +1,96 @@
-# CEM888 — Memory Benchmarks
+# CEM888 — Benchmark Evidence
 
-> ### ⬅️ This is supporting evidence, not the project.
-> **CEM888** is a local-first, model-agnostic agent runtime — state, identity, authority, and verification that live on your machine and persist across Claude, GPT, DeepSeek, and local models.
+> **Supporting evidence for [CEM888](https://github.com/CEM888AI/cem888).**
 >
-> **→ The project: [CEM888AI/cem888](https://github.com/CEM888AI/cem888)** — ⭐ star it · [cem888.ai](https://cem888.ai) · [💗 Sponsor](https://ko-fi.com/cem888ai)
+> CEM888 is a local-first state and control runtime for AI agents. This repository publishes benchmark artifacts, scoring detail, and explicit limitations. It is an evidence archive, not the production runtime.
 
-Public benchmark artifacts for CEM888's runtime, run as a live agent — not a static embeddings pipeline — against independent third-party benchmark datasets. This repo ships the published result files, scoring detail, and a checker for the reported BEAM scorecard. It does **not** claim that the original live-agent generation environment can be recreated from this repository alone.
+## Canonical published results
 
-## Results
+| Benchmark | Published result | Date | Evidence status |
+|---|---:|---|---|
+| MemoryAgentBench — Accurate Retrieval (AR) | **99.90% (1,998/2,000)** | 2026-06-15 | TESTED |
+| BEAM-10M | **77.2%** | 2026-06-16 | TESTED / scorecard arithmetic independently checkable |
+| LoCoMo | **85.8% F1** | 2026-06-07 | TESTED; reverified 2026-06-23 |
 
-### MemoryAgentBench — Accurate Retrieval (AR)
+These are separate benchmarks and should not be compared as if they measure the same capability.
 
-2,000-question hard split, ICLR 2026 benchmark ([HUST-AI-HYZ/MemoryAgentBench](https://github.com/HUST-AI-HYZ/MemoryAgentBench); dataset on [HuggingFace](https://huggingface.co/datasets/ai-hyz/MemoryAgentBench)). Scored with the benchmark's own `substring_exact_match` metric.
+## BEAM-10M — canonical public score: 77.2%
 
-| Agent | AR score | Architecture |
-|---|---|---|
-| **CEM888 (Vetta / deepseek-v4-pro)** | **99.90% (1,998/2,000)** | Agent-native retrieval, live |
-| GPT-4.1-mini | 71.8% | Raw LLM, full context window |
-| HippoRAG-v2 | 65.1% | Structure-augmented RAG |
-| MIRIX | 63.0% | Agentic memory (GPT-4.1-mini) |
-| BM25 | 60.5% | Simple keyword RAG |
-| GPT-4o | 58.1% | Raw LLM, full context window |
-| MemGPT | 30.6% | Agentic memory |
+The **only canonical public CEM888 BEAM-10M score is 77.2%**, produced by Vetta using deepseek-v4-pro on the 200-question BEAM-10M benchmark.
 
-Full run detail, both misses explained, and a per-entry verification sample: [AR-Results-99.9pct.md](./AR-Results-99.9pct.md)
+**Method:** live-agent retrieval and answering through the normal CEM888 memory path, with no answer-key access or `source_chat_ids` supplied to the agent.
 
-**Status: TESTED** — run June 15, 2026, live agent, no answer-key access. Mem0, LangMem, and Letta have not published a result on this specific benchmark, so they aren't included as comparison rows here — see [Notes on comparisons](#notes-on-comparisons).
+**Public artifact:** [Vetta-BEAM-Honest-77.2pct.md](./Vetta-BEAM-Honest-77.2pct.md)
 
-### BEAM — memory at 10M tokens
+**Scorecard check:**
 
-200-question benchmark across 10 memory categories at up to 10M tokens of context (BEAM, Tavakoli et al., ICLR 2026) — the hardest published long-context memory test in general use, and the one most funded competitors quote. See [benchmarks.hindsight.vectorize.io](https://benchmarks.hindsight.vectorize.io/) for the wider public leaderboard.
-
-| System | BEAM-10M | Method | Source |
-|---|---|---|---|
-| **CEM888 (Vetta / deepseek-v4-pro)** | **77.2%** | Honest retrieval, no answer keys | [Vetta-BEAM-Honest-77.2pct.md](./Vetta-BEAM-Honest-77.2pct.md) |
-| CEM888 (CEM engine) | 78.2% *(experimental)* | Honest retrieval, no answer keys | [CEM-BEAM-Honest-78.2pct.md](./CEM-BEAM-Honest-78.2pct.md) |
-| Exabase M-1 | 68.0% | Honest retrieval, smaller/cheaper model | [exabase.io, Jul 2026](https://exabase.io/blog/exabase-m1-achieves-state-of-the-art-on-beam-benchmark) |
-| Hindsight | 64.1% | Honest retrieval | [benchmarks.hindsight.vectorize.io](https://benchmarks.hindsight.vectorize.io/) |
-
-**Status:** Vetta's 77.2% is **TESTED** (published June 16, 2026). The CEM engine's 78.2% is **EXPERIMENTAL** — the run is documented and the methodology is honest (its write-up shows the full score-progression across four attempts, including a 100% run that was rejected for crossing into answer-key leakage), but it hasn't been reproduced enough times yet to stand as the settled number. Until it is, 77.2% is the number CEM888 is held to publicly.
-
-Mem0 has not published a BEAM-10M score as of this writing — their public research covers LongMemEval and LoCoMo, not BEAM. See [mem0.ai/research](https://mem0.ai/research) for their current published numbers.
-
-### LoCoMo
-
-199-question long-term conversational memory benchmark, 9-month simulated relationship, 19 sessions ([LoCoMo, Maharana et al., ACL 2024](https://github.com/snap-research/locomo)), scored via the [context-bench](https://github.com/npow/context-bench) framework.
-
-| Category | F1 | Questions |
-|---|---|---|
-| Single-hop | 92.7% | 32 |
-| Adversarial | 89.4% | 47 |
-| Open-domain | 88.2% | 13 |
-| Multi-hop | 79.0% | 70 |
-| Temporal reasoning | 62.8% | 37 |
-| **Overall** | **85.8%** | 199 |
-
-Full detail: [locomo-results.md](./locomo-results.md). **Status: TESTED**, run June 7 2026, reverified June 23 2026. Presented standalone: the LoCoMo leaderboard moves fast and other systems have published higher overall scores since this run — this is not presented as a claim of leading the category.
-
-## Notes on comparisons
-
-Different memory benchmarks test different things and are not interchangeable. A 99.9% on MemoryAgentBench AR and a published ~93–94% on Mem0's LongMemEval are not the same measurement, and this repo does not present them as if they were. Where a competitor hasn't published on the exact benchmark CEM888 is scored on, that competitor is left out of the row rather than swapped in from a different test. Where scores exist at different context scales (e.g. BEAM at 1M vs. 10M), the scale is stated next to the number, and every competitor number above links to its primary source.
-
-## Methodology
-
-**Honest retrieval only.** Every run above is a live agent answering questions through its normal retrieval and reasoning path — no pre-computed embeddings of the test corpus, no answer-key access, no rubric-echo scoring. Where a run's methodology allows a legitimate borderline technique (natural phrasing that happens to resemble, but doesn't copy, the scoring rubric), the write-up says so explicitly and shows the rejected alternative that crossed the line. Full methodology is in each individual result file.
-
-## Raw data
-
-```
-git clone https://github.com/CEM888AI/benchmarks.git
-```
-
-- `AR-Results-99.9pct.md` — MemoryAgentBench AR, full breakdown + verification sample
-- `Vetta-BEAM-Honest-77.2pct.md` — BEAM-10M, Vetta run
-- `CEM-BEAM-Honest-78.2pct.md` — BEAM-10M, CEM engine run (experimental), including the full honest-score progression and the rejected 100% run
-- `locomo-results.md` — LoCoMo, full category breakdown
-- `beam_question_contexts.json` / `beam_score.py` — BEAM test corpus and scorer
-- `vetta_beam_v9_results.jsonl`, `vetta_live_results.jsonl` — per-question raw results
-- `beam-full-results.html` — interactive results viewer
-
-## Verify the published score
-
-```
+```bash
 git clone https://github.com/CEM888AI/benchmarks.git
 cd benchmarks
 python beam_score.py --check vetta_beam_v9_results.jsonl
 ```
 
-Recomputes the published Vetta BEAM-10M score from the shipped scorecard. For
-each line, the checker validates that the stored fractional `score` agrees with
-the stored `match` fraction at the scorecard's two-decimal precision (for
-example, `12/20 -> 0.60`), rejects duplicate question IDs, reports the
-scorecard SHA-256, then computes the unweighted mean
-across questions.
+Expected output:
 
-For the published Vetta scorecard the expected result is:
-`Overall: 77.2% (154.4/200)`.
-
-**What this proves:** the published JSONL is internally consistent and the
-reported aggregate follows from the shipped per-question scorecard.
-
-**What this does not prove:** that the answers were generated under the claimed
-live-agent conditions. The original live run, model/runtime configuration and
-retrieval environment are described in the run write-up but are not fully
-recreated by `--check`.
-
-The second mode scores a separate raw-answer JSONL against the shipped rubric
-file:
-
-```
-python beam_score.py answers.jsonl beam_question_contexts.json
+```text
+Overall: 77.2% (154.4/200)
 ```
 
-That raw-answer helper uses the implementation visible in `beam_score.py`:
-each rubric item receives credit for a case-insensitive substring match or
->=60% normalized word overlap, and its summary is rubric-item-weighted. It is a
-separate audit utility; it is **not** the algorithm used by `--check` to
-recompute the published 77.2% scorecard.
+### What the public check proves
 
-## What's being tested
+The shipped scorecard is internally consistent and the reported aggregate follows from the published per-question results.
 
-These scores are produced by CEM888's memory runtime, not a standalone retrieval library — a tree-structured memory store (session / episodic / semantic / procedural / vault layers) that a live agent queries as part of normal execution. What's public here is the methodology, the raw results, and enough of the architecture (in [runtime-case-studies](https://github.com/CEM888AI/runtime-case-studies)) to evaluate whether the results are credible.
+### What it does not prove
+
+This repository does **not** fully recreate the original live-agent generation environment, model/runtime configuration, or retrieval state. Those conditions are documented in the run write-up but are not independently reconstructed by `--check`.
+
+Future BEAM numbers do **not** replace 77.2% publicly unless they ship with a complete per-question artifact, frozen methodology, scorer, date, model/runtime identity, and enough evidence to support the stronger claim.
+
+## MemoryAgentBench — Accurate Retrieval
+
+2,000-question hard split from MemoryAgentBench (ICLR 2026), scored with the benchmark's `substring_exact_match` metric.
+
+**CEM888 result: 99.90% (1,998/2,000).**
+
+Run detail and verification sample: [AR-Results-99.9pct.md](./AR-Results-99.9pct.md)
+
+**Limit:** this is a benchmark-specific retrieval result. It is not a claim that every CEM888 task, memory operation, or runtime behavior is 99.9% accurate.
+
+## LoCoMo
+
+199-question conversational-memory evaluation spanning single-hop, multi-hop, temporal, adversarial, and open-domain questions.
+
+**Overall: 85.8% F1.**
+
+Full detail: [locomo-results.md](./locomo-results.md)
+
+This result is presented standalone. It is not claimed as a current category-leading score.
+
+## Raw/public artifacts
+
+- `AR-Results-99.9pct.md` — MemoryAgentBench AR result and verification sample
+- `Vetta-BEAM-Honest-77.2pct.md` — canonical BEAM-10M result
+- `vetta_beam_v9_results.jsonl` — published BEAM per-question scorecard
+- `vetta_live_results.jsonl` — retained live-result artifact
+- `beam_question_contexts.json` / `beam_score.py` — BEAM corpus/scoring utilities
+- `beam-full-results.html` — result viewer
+- `locomo-results.md` — LoCoMo result breakdown
+
+## Evidence policy
+
+Public benchmark claims must state:
+
+- the benchmark and version/split where known;
+- run date;
+- model/provider identity;
+- scoring method;
+- the artifact supporting the number;
+- what can and cannot be independently reproduced.
+
+Experimental or exploratory runs may inform engineering, but they do not become public headline numbers until they satisfy the evidence requirements above.
 
 ---
 
-**CEM888** — local-first agent runtime. **[⭐ Star the repo](https://github.com/CEM888AI/cem888)** · [cem888.ai](https://cem888.ai) · [💗 Sponsor](https://ko-fi.com/cem888ai) · creator@cem888.ai
+**CEM888** — local-first state & control runtime underneath AI agents.
 
-Built by Chandler Morone. Questions on methodology or raw data: creator@cem888.ai
+[⭐ CEM888](https://github.com/CEM888AI/cem888) · [cem888.ai](https://cem888.ai) · [Engineering case studies](https://github.com/CEM888AI/runtime-case-studies) · creator@cem888.ai
