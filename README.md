@@ -1,6 +1,6 @@
 # CEM888 — Benchmark Evidence
 
-> **Supporting evidence for [CEM888](https://github.com/CEM888AI/cem888).**
+> **Supporting evidence for [CEM888](https://cem888.ai).**
 >
 > CEM888 is a local-first state and control runtime for AI agents. This repository publishes benchmark artifacts, scoring detail, and explicit limitations. It is an evidence archive, not the production runtime.
 
@@ -93,4 +93,4 @@ Experimental or exploratory runs may inform engineering, but they do not become 
 
 **CEM888** — local-first state & control runtime underneath AI agents.
 
-[⭐ CEM888](https://github.com/CEM888AI/cem888) · [cem888.ai](https://cem888.ai) · [Engineering case studies](https://github.com/CEM888AI/runtime-case-studies) · creator@cem888.ai
+[CEM888](https://cem888.ai) · [Engineering case studies](https://github.com/CEM888AI/runtime-case-studies) · [Current engineering status](https://github.com/CEM888AI/runtime-case-studies/blob/main/current-engineering-status.md) · creator@cem888.ai
